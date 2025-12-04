@@ -14,6 +14,7 @@ import {
 } from './components';
 import { useSettingsStore, useBookmarkStore } from './stores';
 import { fetchRandomWallpaper } from './utils/wallpaperApi';
+import { cacheAndCleanupWallpaper } from './utils/cacheManager';
 import { I18nProvider, type Locale } from './i18n';
 import './styles/globals.css';
 import styles from './App.module.css';
@@ -78,16 +79,23 @@ function App() {
     const wallpaper = await fetchRandomWallpaper();
     return wallpaper.url;
   };
-
   // 应用随机壁纸
-  const applyRandomWallpaper = (url: string) => {
-    const isDark = settings.themeMode === 'dark';
-    if (isDark) {
-      updateSettings({ randomWallpaperImage: url });
-    } else {
-      updateSettings({ randomWallpaperImageLight: url });
-    }
-  };
+  const applyRandomWallpaper = (newUrl: string) => {
+  const isDark = settings.themeMode === 'dark';
+  
+  // 1. 获取当前正在使用的旧 URL
+  const oldUrl = isDark ? settings.randomWallpaperImage : settings.randomWallpaperImageLight;
+  
+  // 2. 调用缓存工具：将新 URL 存入缓存，并删除旧 URL
+  cacheAndCleanupWallpaper(newUrl, oldUrl); 
+
+  // 3. 更新设置 (使用新的 URL)
+  if (isDark) {
+    updateSettings({ randomWallpaperImage: newUrl });
+  } else {
+    updateSettings({ randomWallpaperImageLight: newUrl });
+  }
+};
 
   // 切换语言
   const handleLocaleChange = (locale: Locale) => {

@@ -9,6 +9,8 @@ export interface Bookmark {
   createdAt: number;
   visitCount: number;
   lastVisitedAt?: number;
+  // ✅ 关键修复：新增自定义图标 URL 字段，解决 BookmarkGrid 的 TS 报错
+  customIconUrl?: string;
 }
 
 // 分类类型
@@ -26,6 +28,8 @@ export interface QuickLink {
   icon?: string;
   color: string;
   order: number;
+  // 保持与 Bookmark 一致，支持自定义图标
+  customIconUrl?: string;
 }
 
 // 搜索引擎类型
@@ -190,15 +194,6 @@ export const DEFAULT_SETTINGS: Settings = {
   locale: 'zh-CN',
   borderRadius: 'medium',
 };
-
-// 每日一言
-export const QUOTES = [
-  { text: '"代码是写给人看的，顺便让机器执行。"', source: '— Donald Knuth' },
-  { text: '"先让它工作，再让它正确，最后让它快。"', source: '— Kent Beck' },
-  { text: '"优秀程序员写人能懂的代码。"', source: '— Martin Fowler' },
-  { text: '"最好的代码是没有代码。"', source: '— Jeff Atwood' },
-  { text: '"过早优化是万恶之源。"', source: '— Donald Knuth' },
-];
 
 // 生成随机颜色
 export const COLORS = [

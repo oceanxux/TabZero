@@ -1,11 +1,41 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, type SyntheticEvent } from 'react';
 import { useQuickLinkStore } from '../../stores';
-import { getFaviconUrl } from '../../utils';
 import { useTranslation } from '../../i18n';
 import { EditModal, type EditModalField } from '../EditModal';
 import { ContextMenu, type ContextMenuItem } from '../ui';
 import { COLORS } from '../../types';
 import styles from './QuickLinks.module.css';
+
+// -------------------------------------------------------------------
+// Favicon 错误处理函数 (保持不变)
+// -------------------------------------------------------------------
+const handleFaviconError = (e: SyntheticEvent<HTMLImageElement, Event>, siteUrl: string) => {
+    const img = e.currentTarget;
+    img.onerror = null; 
+    
+    const currentSrc = img.src;
+    
+    // 1. 如果当前是 Chrome 内部 API (初始加载)
+    if (currentSrc.includes('chrome-extension://_favicon')) {
+        // 切换到 Google S2 API (Fallback 1)
+        img.src = `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(siteUrl)}`;
+    } 
+    // 2. 如果是 Google S2 API
+    else if (currentSrc.includes('google.com/s2/favicons')) {
+        try {
+            // 切换到网站根目录 /favicon.ico (Fallback 2)
+            const origin = new URL(siteUrl).origin;
+            img.src = `${origin}/favicon.ico`;
+        } catch {
+            // URL解析失败，忽略
+        }
+    }
+    // 3. 彻底失败，隐藏图标
+    else {
+        img.style.display = 'none'; 
+    }
+};
+
 
 export function QuickLinks() {
   const { quickLinks, addQuickLink, updateQuickLink, deleteQuickLink, reorderQuickLinks } = useQuickLinkStore();
@@ -19,6 +49,7 @@ export function QuickLinks() {
   const [isDropZoneActive, setIsDropZoneActive] = useState(false);
   const dragItemRef = useRef<string | null>(null);
 
+  // ✅ 关键修改 1：新增自定义图标 URL 字段
   const fields: EditModalField[] = [
     {
       key: 'title',
@@ -34,24 +65,35 @@ export function QuickLinks() {
       placeholder: t.quickLinks.urlPlaceholder,
       required: true,
     },
+    {
+        key: 'customIconUrl',
+        label: '自定义图标 URL',
+        type: 'url',
+        placeholder: '粘贴 PNG/SVG/ICO 链接',
+        required: false,
+    },
   ];
 
+  // ✅ 关键修改 2：handleAdd - 保存 customIconUrl
   const handleAdd = (values: Record<string, string>) => {
     const newLink = {
       id: `ql-${Date.now()}`,
       title: values.title,
       url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
+      customIconUrl: values.customIconUrl || '', // 👈 保存自定义 URL
       color: COLORS[Math.floor(Math.random() * COLORS.length)],
       order: quickLinks.length,
     };
     addQuickLink(newLink);
   };
 
+  // ✅ 关键修改 3：handleEdit - 更新 customIconUrl
   const handleEdit = (values: Record<string, string>) => {
     if (!editingLink) return;
     updateQuickLink(editingLink, {
       title: values.title,
       url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
+      customIconUrl: values.customIconUrl || '', // 👈 更新自定义 URL
     });
   };
 
@@ -225,11 +267,12 @@ export function QuickLinks() {
               onDragEnd={handleDragEnd}
             >
               <div className={styles.icon}>
-                {link.icon ? (
-                  <img src={link.icon} alt="" />
-                ) : (
-                  <img src={getFaviconUrl(link.url)} alt="" />
-                )}
+                {/* 关键修改 4：优先显示自定义图标，否则进入回退链 */}
+                <img 
+                  src={link.customIconUrl || link.icon || `chrome-extension://_favicon/?pageUrl=${encodeURIComponent(link.url)}&size=32`}
+                  alt="" 
+                  onError={(e) => handleFaviconError(e, link.url)} 
+                />
               </div>
               <span className={styles.name}>{link.title}</span>
             </a>
@@ -260,7 +303,7 @@ export function QuickLinks() {
         fields={fields}
         initialValues={
           currentLink
-            ? { title: currentLink.title, url: currentLink.url }
+            ? { title: currentLink.title, url: currentLink.url, customIconUrl: currentLink.customIconUrl || '' } // 👈 初始化时带上 customIconUrl
             : {}
         }
         onSave={handleEdit}

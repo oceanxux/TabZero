@@ -1,10 +1,41 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, type SyntheticEvent } from 'react';
 import { useBookmarkStore, useTrashStore } from '../../stores';
-import { getFaviconUrl, getDomain } from '../../utils';
+import { getDomain } from '../../utils'; // 👈 仅保留 getDomain
 import { ContextMenu, ConfirmDialog, type ContextMenuItem } from '../ui';
 import { EditModal, type EditModalField } from '../EditModal';
 import { useTranslation } from '../../i18n';
 import styles from './BookmarkGrid.module.css';
+
+// -------------------------------------------------------------------
+// ✅ 关键添加：Favicon 错误处理函数 (必须定义，否则代码会崩溃)
+// -------------------------------------------------------------------
+const handleFaviconError = (e: SyntheticEvent<HTMLImageElement, Event>, siteUrl: string) => {
+    const img = e.currentTarget;
+    img.onerror = null; 
+    
+    const currentSrc = img.src;
+    
+    // 1. 如果当前 URL 包含 google.com/s2/favicons (或 getFaviconUrl 返回的 URL)
+    if (currentSrc.includes('google.com/s2/favicons')) {
+        // 切换到 Chrome 扩展中最可靠的内部 Favicon API (Fallback 1)
+        img.src = `chrome-extension://_favicon/?pageUrl=${encodeURIComponent(siteUrl)}&size=32`;
+    } 
+    // 2. 如果已经是 Chrome 内部 API 
+    else if (currentSrc.includes('chrome-extension://_favicon')) {
+        try {
+            // 切换到网站根目录 /favicon.ico (Fallback 2)
+            const origin = new URL(siteUrl).origin;
+            img.src = `${origin}/favicon.ico`;
+        } catch {
+            // URL解析失败，忽略
+        }
+    }
+    // 3. 如果以上都失败，使用一个空白占位符
+    else {
+        img.style.display = 'none'; 
+    }
+};
+// -------------------------------------------------------------------
 
 export function BookmarkGrid() {
   const {
@@ -59,7 +90,7 @@ export function BookmarkGrid() {
     incrementVisitCount(id);
   };
 
-  // 书签表单字段
+  // 书签表单字段 (✅ 新增自定义图标 URL 字段)
   const bookmarkFields: EditModalField[] = [
     {
       key: 'title',
@@ -84,6 +115,13 @@ export function BookmarkGrid() {
         .map((c) => ({ value: c.id, label: c.name })),
       required: true,
     },
+    {
+      key: 'customIconUrl', // 👈 新增：自定义图标 URL
+      label: '自定义图标 URL',
+      type: 'url',
+      placeholder: '粘贴图标 PNG/SVG 链接',
+      required: false,
+    },
   ];
 
   // 分类表单字段
@@ -97,12 +135,14 @@ export function BookmarkGrid() {
     },
   ];
 
+  // ✅ 关键修改：handleEditBookmark - 保存 customIconUrl
   const handleEditBookmark = (values: Record<string, string>) => {
     if (!editingBookmark) return;
     updateBookmark(editingBookmark, {
       title: values.title,
       url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
       categoryId: values.categoryId,
+      customIconUrl: values.customIconUrl || '', // 👈 保存新字段
     });
   };
 
@@ -419,11 +459,12 @@ export function BookmarkGrid() {
                     className={styles.icon}
                     style={{ backgroundColor: bookmark.color }}
                   >
-                    {bookmark.icon ? (
-                      <img src={bookmark.icon} alt="" />
-                    ) : (
-                      <img src={getFaviconUrl(bookmark.url)} alt="" />
-                    )}
+                    {/* ✅ 关键修复点：整合 Favicon 回退逻辑，优先使用 customIconUrl */}
+                    <img 
+                      src={bookmark.customIconUrl || bookmark.icon || `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(bookmark.url)}`}
+                      alt="" 
+                      onError={(e) => handleFaviconError(e, bookmark.url)} // 👈 新增
+                    />
                   </div>
                   <div className={styles.info}>
                     <span className={styles.title}>{bookmark.title}</span>
@@ -447,6 +488,7 @@ export function BookmarkGrid() {
                 title: currentBookmark.title,
                 url: currentBookmark.url,
                 categoryId: currentBookmark.categoryId,
+                customIconUrl: currentBookmark.customIconUrl || '', // 👈 初始化时带上 customIconUrl
               }
             : {}
         }

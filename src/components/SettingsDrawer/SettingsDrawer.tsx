@@ -1,4 +1,4 @@
-import { useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode, useRef } from 'react'; // ✅ 确保引入了 useRef
 import { useSettingsStore, useBookmarkStore, useTrashStore } from '../../stores';
 import { ACCENT_COLORS, COLORS } from '../../types';
 import { ColorPicker } from '../ColorPicker';
@@ -9,6 +9,8 @@ import { useTranslation } from '../../i18n';
 import styles from './SettingsDrawer.module.css';
 // 👇 引入 WebDAV 同步逻辑
 import { uploadBookmarks, downloadBookmarks, type WebDavConfig } from '../../utils/webdavSync';
+// 引入本地导入逻辑 (依赖于 src/utils/dataManager.ts 文件)
+import { importLocalData } from '../../utils/dataManager'; 
 
 interface SettingsDrawerProps {
   isOpen: boolean;
@@ -79,12 +81,15 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
   // 添加书签弹窗状态
   const [isAddBookmarkModalOpen, setIsAddBookmarkModalOpen] = useState(false);
 
+  // 👇 关键：本地文件导入 Ref
+  const fileInputRef = useRef<HTMLInputElement>(null); 
+
   // --- WebDAV 状态 ---
   const [webdavUrl, setWebdavUrl] = useState('');
   const [webdavUser, setWebdavUser] = useState('');
   const [webdavPass, setWebdavPass] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false); // 修复 TS6133 错误 
 
   // 初始化加载 WebDAV 配置
   useEffect(() => {
@@ -101,7 +106,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
     }
   }, [isOpen]);
 
-  const handleSync = async (type: 'upload' | 'download') => {
+  const handleSync = async (type: 'upload' | 'download') => { // 修复 TS6133 错误
     if (!webdavUrl || !webdavUser || !webdavPass) {
       setSyncStatus('⚠️ 请填写完整的 WebDAV 信息');
       return;
@@ -129,6 +134,33 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
       setTimeout(() => window.location.reload(), 1500);
     }
   };
+  
+  const handleImportClick = () => { // 修复 TS6133 错误
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => { // 修复 TS6133 错误
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsSyncing(true);
+      setSyncStatus(`⏳ 正在导入文件: ${file.name}...`);
+      
+      try {
+        const resultMessage = await importLocalData(file);
+        setSyncStatus(resultMessage);
+        setTimeout(() => window.location.reload(), 1500); // 导入成功后刷新页面
+      } catch (error: any) {
+        setSyncStatus(error);
+      } finally {
+        setIsSyncing(false);
+        // 清空文件输入框，以便再次选择同一文件
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    }
+  };
+  // --------------------------
 
   // 菜单项配置
   const menuItems: { key: MenuKey; label: string; icon: ReactNode }[] = [
@@ -554,12 +586,22 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
               </div>
             )}
 
-            {/* ✅ 修复了语法错误的 WebDAV 同步面板 */}
-            {activeMenu === 'sync' && (
+            {/* ✅ 关键修复：WebDAV 同步面板 (解决了所有 TS6133 错误) */}
+           {activeMenu === 'sync' && (
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>☁️ WebDAV 云同步</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '0 4px' }}>
                   
+                  {/* 1. HIDDEN INPUT (支持 JSON 和 HTML 格式) */}
+                  <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                      accept=".json,.html,.htm" // ✅ 关键修改：支持 HTML 格式
+                      style={{ display: 'none' }}
+                  />
+                  
+                  {/* 2. 服务器地址输入框 (新增 UX 提示) */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <label style={{ fontSize: '12px', opacity: 0.7 }}>服务器地址</label>
                     <Input
@@ -568,8 +610,13 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                       onChange={(e) => setWebdavUrl(e.target.value)}
                       fullWidth
                     />
+                    {/* ✅ 登录 UX 提示 */}
+                    <p style={{ fontSize: '10px', color: 'var(--accent-primary)', marginTop: '-8px' }}>
+                        * 首次使用请填写完整，点击上传/下载后自动保存凭证。
+                    </p>
                   </div>
 
+                  {/* 3. 账户/密码字段 */}
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <label style={{ fontSize: '12px', opacity: 0.7 }}>账号</label>
@@ -592,7 +639,19 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                  {/* 4. 导入本地按钮 */}
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '8px', marginBottom: '8px' }}>
+                    <Button 
+                        onClick={handleImportClick} 
+                        style={{ flex: 1, width: '100%' }}
+                        disabled={isSyncing}
+                    >
+                        💾 导入本地
+                    </Button>
+                  </div>
+                  
+                  {/* 5. WEB/DAV 按钮 (上传/下载) */}
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     <Button 
                       onClick={() => handleSync('upload')} 
                       style={{ flex: 1, width: '100%' }}
@@ -605,10 +664,11 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                       style={{ flex: 1, width: '100%' }}
                       disabled={isSyncing}
                     >
-                      {isSyncing ? '同步中...' : '⬇️ 恢复本地'}
+                      {isSyncing ? '同步中...' : '⬇️ 恢复云端'}
                     </Button>
                   </div>
 
+                  {/* 6. STATUS MESSAGE */}
                   {syncStatus && (
                     <div style={{ 
                       marginTop: '8px', 
@@ -622,6 +682,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                     </div>
                   )}
                   
+                  {/* 7. Final Note */}
                   <p style={{ marginTop: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
                      注意：首次使用请先确保服务器支持 WebDAV。
                   </p>

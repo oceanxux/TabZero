@@ -8,7 +8,8 @@ export interface WebDavConfig {
     password: string;
 }
 
-const SYNC_FILE_NAME = "cleartab_bookmarks.json";
+// ✅ 关键修改：将文件名更改为 TabZero
+const SYNC_FILE_NAME = "TabZero_bookmarks.json";
 
 // 获取 WebDAV 客户端实例
 const getClient = (config: WebDavConfig) => {
@@ -18,7 +19,7 @@ const getClient = (config: WebDavConfig) => {
     });
 };
 
-// 📤 导出函数 1：上传备份 (Upload)
+// 📤 上传备份 (Upload)
 export const uploadBookmarks = async (config: WebDavConfig) => {
     const client = getClient(config);
 
@@ -35,16 +36,16 @@ export const uploadBookmarks = async (config: WebDavConfig) => {
 
     try {
         console.log("正在连接 WebDAV 上传...");
-        // 将数据转为 JSON 字符串并写入文件
+        // 写入文件，使用新的文件名
         await client.putFileContents(`/${SYNC_FILE_NAME}`, JSON.stringify(dataToSync, null, 2));
-        return { success: true, message: `✅ 备份成功！时间: ${new Date().toLocaleString()}` };
+        return { success: true, message: `✅ 备份成功！文件: ${SYNC_FILE_NAME} 时间: ${new Date().toLocaleString()}` };
     } catch (error) {
         console.error("WebDAV Upload Error:", error);
         return { success: false, message: "❌ 上传失败: 请检查地址/账号/密码或跨域权限。" };
     }
 };
 
-// 📥 导出函数 2：下载恢复 (Download) - 之前报错缺少的就是这个
+// 📥 下载恢复 (Download)
 export const downloadBookmarks = async (config: WebDavConfig) => {
     const client = getClient(config);
 
@@ -54,7 +55,7 @@ export const downloadBookmarks = async (config: WebDavConfig) => {
         // 检查文件是否存在
         const exists = await client.exists(`/${SYNC_FILE_NAME}`);
         if (!exists) {
-            return { success: false, message: "⚠️ 云端未找到备份文件 (cleartab_bookmarks.json)" };
+            return { success: false, message: `⚠️ 云端未找到备份文件 (${SYNC_FILE_NAME})` };
         }
 
         // 读取文件内容

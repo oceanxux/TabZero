@@ -1,29 +1,30 @@
 import { useState, useMemo, useCallback, useRef, type SyntheticEvent } from 'react';
 import { useBookmarkStore, useTrashStore } from '../../stores';
-import { getDomain } from '../../utils'; // 👈 仅保留 getDomain
+import { getDomain } from '../../utils'; // ✅ 修复 TS6133：删除了未使用的 getFaviconUrl 导入
 import { ContextMenu, ConfirmDialog, type ContextMenuItem } from '../ui';
 import { EditModal, type EditModalField } from '../EditModal';
 import { useTranslation } from '../../i18n';
 import styles from './BookmarkGrid.module.css';
 
 // -------------------------------------------------------------------
-// ✅ 关键添加：Favicon 错误处理函数 (必须定义，否则代码会崩溃)
+// ✅ 关键添加：Favicon 错误处理函数 (必须定义，用于 onError 回退)
 // -------------------------------------------------------------------
 const handleFaviconError = (e: SyntheticEvent<HTMLImageElement, Event>, siteUrl: string) => {
     const img = e.currentTarget;
+    // 阻止无限循环报错，只执行一次回退
     img.onerror = null; 
     
     const currentSrc = img.src;
     
-    // 1. 如果当前 URL 包含 google.com/s2/favicons (或 getFaviconUrl 返回的 URL)
-    if (currentSrc.includes('google.com/s2/favicons')) {
-        // 切换到 Chrome 扩展中最可靠的内部 Favicon API (Fallback 1)
-        img.src = `chrome-extension://_favicon/?pageUrl=${encodeURIComponent(siteUrl)}&size=32`;
+    // 1. 如果当前 URL 包含 chrome-extension://_favicon (即 Chrome 内部 API 失败)
+    if (currentSrc.includes('chrome-extension://_favicon')) {
+        // 切换到 Google S2 API (Fallback 1)
+        img.src = `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(siteUrl)}`;
     } 
-    // 2. 如果已经是 Chrome 内部 API 
-    else if (currentSrc.includes('chrome-extension://_favicon')) {
+    // 2. 如果是 Google S2 API 失败了
+    else if (currentSrc.includes('google.com/s2/favicons')) {
         try {
-            // 切换到网站根目录 /favicon.ico (Fallback 2)
+            // 切换到网站根目录 /favicon.ico (Fallback 2 - 可能会有 CORS 限制)
             const origin = new URL(siteUrl).origin;
             img.src = `${origin}/favicon.ico`;
         } catch {
@@ -116,7 +117,7 @@ export function BookmarkGrid() {
       required: true,
     },
     {
-      key: 'customIconUrl', // 👈 新增：自定义图标 URL
+      key: 'customIconUrl', 
       label: '自定义图标 URL',
       type: 'url',
       placeholder: '粘贴图标 PNG/SVG 链接',
@@ -459,7 +460,7 @@ export function BookmarkGrid() {
                     className={styles.icon}
                     style={{ backgroundColor: bookmark.color }}
                   >
-                    {/* ✅ 关键修复点：整合 Favicon 回退逻辑，优先使用 customIconUrl */}
+                    {/* ✅ 关键修复点：整合 Favicon 回退逻辑 */}
                     <img 
                       src={bookmark.customIconUrl || bookmark.icon || `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(bookmark.url)}`}
                       alt="" 
@@ -520,6 +521,6 @@ export function BookmarkGrid() {
         cancelText="取消"
         danger
       />
-    </div>
+    </div >
   );
 }

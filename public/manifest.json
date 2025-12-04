@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "bookmarks",
-    "topSites"
+    "topSites",
+    "tabs"
   ],
   "host_permissions": [
     "<all_urls>"

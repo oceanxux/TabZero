@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getEnabledEngines, getAllEngines } from '../../types';
-import { useSettingsStore, useSearchHistoryStore } from '../../stores';
+import { useSettingsStore } from '../../stores'; // ❌ 移除了 useSearchHistoryStore
 import { SearchEngineModal } from '../SearchEngineModal';
 import { useTranslation } from '../../i18n';
 import styles from './SearchBar.module.css';
@@ -10,10 +10,12 @@ export function SearchBar() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [isHistoryClosing, setIsHistoryClosing] = useState(false);
+  
+  // ❌ 移除了历史记录相关的 state (isHistoryOpen, isHistoryClosing)
+
   const { settings, updateSettings } = useSettingsStore();
-  const { history, addHistory, removeHistory, clearHistory } = useSearchHistoryStore();
+  // ❌ 移除了 history store 的解构
+
   const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,15 +55,7 @@ export function SearchBar() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // 过滤历史记录（根据输入）
-  const filteredHistory = useMemo(() => {
-    if (!query.trim()) {
-      return history.slice(0, 8);
-    }
-    return history
-      .filter((item) => item.query.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, 8);
-  }, [history, query]);
+  // ❌ 移除了 filteredHistory 计算逻辑
 
   // 关闭面板（带动画）
   const closePanel = () => {
@@ -72,14 +66,7 @@ export function SearchBar() {
     }, 150);
   };
 
-  // 关闭历史面板（带动画）
-  const closeHistory = () => {
-    setIsHistoryClosing(true);
-    setTimeout(() => {
-      setIsHistoryOpen(false);
-      setIsHistoryClosing(false);
-    }, 150);
-  };
+  // ❌ 移除了 closeHistory 函数
 
   // 点击外部关闭面板
   useEffect(() => {
@@ -88,53 +75,30 @@ export function SearchBar() {
         if (isPanelOpen && !isClosing) {
           closePanel();
         }
-        if (isHistoryOpen && !isHistoryClosing) {
-          closeHistory();
-        }
+        // ❌ 移除了关闭历史面板的逻辑
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isPanelOpen, isClosing, isHistoryOpen, isHistoryClosing]);
+  }, [isPanelOpen, isClosing]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      // 添加到搜索历史
-      addHistory(query.trim(), currentEngine.id);
+      // ❌ 移除了 addHistory 调用，不再记录历史
       window.location.href = currentEngine.url + encodeURIComponent(query.trim());
     }
   };
 
-  // 点击历史记录项
-  const handleHistoryClick = (historyQuery: string) => {
-    setQuery(historyQuery);
-    closeHistory();
-    // 直接搜索
-    addHistory(historyQuery, currentEngine.id);
-    window.location.href = currentEngine.url + encodeURIComponent(historyQuery);
-  };
-
-  // 删除单条历史记录
-  const handleDeleteHistory = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    removeHistory(id);
-  };
-
-  // 输入框获得焦点时显示历史
-  const handleInputFocus = () => {
-    if (history.length > 0 && !isPanelOpen) {
-      setIsHistoryOpen(true);
-    }
-  };
+  // ❌ 移除了 handleHistoryClick (点击历史记录)
+  // ❌ 移除了 handleDeleteHistory (删除历史记录)
+  // ❌ 移除了 handleInputFocus (聚焦显示历史)
 
   // 输入框内容变化
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
-    if (!isHistoryOpen && history.length > 0 && !isPanelOpen) {
-      setIsHistoryOpen(true);
-    }
+    // ❌ 移除了触发历史面板显示的逻辑
   };
 
   const handleEngineSelect = (engineId: string) => {
@@ -148,10 +112,7 @@ export function SearchBar() {
       closePanel();
     } else {
       setIsPanelOpen(true);
-      // 打开引擎面板时关闭历史面板
-      if (isHistoryOpen) {
-        closeHistory();
-      }
+      // ❌ 移除了关闭历史面板的逻辑
     }
   };
 
@@ -203,7 +164,7 @@ export function SearchBar() {
           placeholder={t.search.placeholder}
           value={query}
           onChange={handleInputChange}
-          onFocus={handleInputFocus}
+          // ❌ 移除了 onFocus 事件
         />
         <button type="submit" className={styles.submitButton}>
           <svg
@@ -260,57 +221,7 @@ export function SearchBar() {
         </div>
       )}
 
-      {/* 搜索历史面板 */}
-      {isHistoryOpen && filteredHistory.length > 0 && (
-        <div className={`${styles.historyPanel} ${isHistoryClosing ? styles.closing : ''}`}>
-          <div className={styles.historyHeader}>
-            <span className={styles.historyTitle}>搜索历史</span>
-            <button
-              type="button"
-              className={styles.clearHistoryButton}
-              onClick={() => {
-                clearHistory();
-                closeHistory();
-              }}
-            >
-              清空
-            </button>
-          </div>
-          <div className={styles.historyList}>
-            {filteredHistory.map((item) => (
-              <div
-                key={item.id}
-                className={styles.historyItem}
-                onClick={() => handleHistoryClick(item.query)}
-              >
-                <svg
-                  className={styles.historyIcon}
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span className={styles.historyQuery}>{item.query}</span>
-                <button
-                  type="button"
-                  className={styles.deleteHistoryButton}
-                  onClick={(e) => handleDeleteHistory(e, item.id)}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ❌ 彻底删除了搜索历史面板的 JSX 代码块 */}
 
       <SearchEngineModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>

@@ -209,7 +209,7 @@ export function QuickLinks() {
       onDragLeave={handleContainerDragLeave}
       onDrop={handleContainerDrop}
     >
-      <h3 className={styles.title}>{t.quickLinks.title}</h3>
+      {/* ❌ 标题已被移除 */}
       <div className={styles.list}>
         {quickLinks.map((link, index) => (
           <ContextMenu key={link.id} items={getContextMenuItems(link.id)}>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && npm run copy-manifest",
-    "copy-manifest": "cp public/manifest.json dist/ && cp -r public/icons dist/ 2>/dev/null || true",
+    "copy-manifest": "cp public/manifest.json TabZero/ && cp -r public/icons TabZero/ 2>/dev/null || true",
     "lint": "eslint .",
     "preview": "vite preview"
   },

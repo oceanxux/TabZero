@@ -10,3 +10,4 @@ export { ColorPicker } from './ColorPicker';
 export { WallpaperButton } from './WallpaperButton';
 export { GlobalSearch } from './GlobalSearch';
 export { EditModal, type EditModalField } from './EditModal';
+export { QuickLinks } from './QuickLinks';

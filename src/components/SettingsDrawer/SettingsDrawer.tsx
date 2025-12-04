@@ -7,7 +7,7 @@ import { TrashPanel } from '../TrashPanel';
 import { EditModal, type EditModalField } from '../EditModal';
 import { useTranslation } from '../../i18n';
 import styles from './SettingsDrawer.module.css';
-// 👇 引入 WebDAV 同步逻辑 (请确保 src/utils/webdavSync.ts 文件已创建)
+// 👇 引入 WebDAV 同步逻辑
 import { uploadBookmarks, downloadBookmarks, type WebDavConfig } from '../../utils/webdavSync';
 
 interface SettingsDrawerProps {
@@ -15,7 +15,7 @@ interface SettingsDrawerProps {
   onClose: () => void;
 }
 
-// ✅ 新增 'sync' 菜单类型
+// ✅ 包含 'sync' 的菜单定义
 type MenuKey = 'theme' | 'bookmarks' | 'categories' | 'trash' | 'sync' | 'system';
 
 // --- 图标组件 ---
@@ -62,7 +62,6 @@ const BookmarkIcon = () => (
   </svg>
 );
 
-// ✅ 新增 Cloud Icon
 const CloudIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
@@ -80,7 +79,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
   // 添加书签弹窗状态
   const [isAddBookmarkModalOpen, setIsAddBookmarkModalOpen] = useState(false);
 
-  // --- WebDAV 状态 (新增) ---
+  // --- WebDAV 状态 ---
   const [webdavUrl, setWebdavUrl] = useState('');
   const [webdavUser, setWebdavUser] = useState('');
   const [webdavPass, setWebdavPass] = useState('');
@@ -130,14 +129,13 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
       setTimeout(() => window.location.reload(), 1500);
     }
   };
-  // --------------------------
 
-  // 动态生成菜单项 (加入了 Sync)
+  // 菜单项配置
   const menuItems: { key: MenuKey; label: string; icon: ReactNode }[] = [
     { key: 'theme', label: t.settings.theme.title, icon: <ThemeIcon /> },
     { key: 'bookmarks', label: t.bookmarks.addBookmark, icon: <BookmarkIcon /> },
     { key: 'categories', label: t.bookmarks.form.category, icon: <CategoryIcon /> },
-    { key: 'sync', label: '云同步', icon: <CloudIcon /> }, // ✅ 新增入口
+    { key: 'sync', label: '云同步', icon: <CloudIcon /> },
     { key: 'trash', label: t.settings.trash.title, icon: <TrashIcon /> },
     { key: 'system', label: t.settings.system.title, icon: <SystemIcon /> },
   ];
@@ -475,20 +473,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                         onChange={(checked) => updateSettings({ showClock: checked })}
                       />
                     </div>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.display.showQuote}</span>
-                      <Switch
-                        checked={settings.showQuote}
-                        onChange={(checked) => updateSettings({ showQuote: checked })}
-                      />
-                    </div>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.display.showRecentVisits}</span>
-                      <Switch
-                        checked={settings.showRecentVisits}
-                        onChange={(checked) => updateSettings({ showRecentVisits: checked })}
-                      />
-                    </div>
+                    {/* 已删除: 每日一言 & 最近访问 */}
                     <div className={styles.settingRow}>
                       <span className={styles.settingLabel}>{t.settings.display.showQuickLinks}</span>
                       <Switch
@@ -569,7 +554,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
               </div>
             )}
 
-            {/* ✅ 新增：WebDAV 同步面板 */}
+            {/* ✅ 修复了语法错误的 WebDAV 同步面板 */}
             {activeMenu === 'sync' && (
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>☁️ WebDAV 云同步</h3>

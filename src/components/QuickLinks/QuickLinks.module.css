@@ -3,6 +3,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -12,6 +13,15 @@
 .container {
   margin-bottom: 16px;
   animation: fadeInUp 0.5s ease 0.15s backwards;
+
+  /* ✅ 新增：让整个容器在页面居中 */
+  width: 100%;
+  max-width: 800px;
+  /* 限制最大宽度，你可以根据需要调整这个数字 */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 16px;
+  /* 防止在小屏幕贴边 */
 }
 
 .title {
@@ -22,36 +32,59 @@
   color: var(--text-muted);
   margin-bottom: 10px;
   text-shadow: var(--text-shadow);
+  /* ✅ 新增：如果想让标题也居中，取消下面的注释 */
+  /* text-align: center; */
 }
 
 .list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  /* ❌ 删除：原来的 Flex 布局 */
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+
+  /* ✅ 新增：Grid 网格布局 */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 强制一行 4 个，等宽 */
+  gap: 16px;
+  /* 调整间距，原来是 8px 有点挤 */
+
+  /* 让网格内的内容垂直居中 */
+  align-items: stretch;
 }
 
 .link {
-  display: inline-flex;
+  /* ✅ 修改：改为 flex 以便控制内部对齐，且宽度填满网格 */
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  /* 让文字和图标在按钮里居中 */
+
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
+  padding: 10px 12px;
+  /* 稍微增加一点高度 */
   background: var(--bg-card);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   transition: var(--transition);
+  text-decoration: none;
+  /* 防止链接有下划线 */
 }
 
 .link:hover {
   background: var(--bg-hover);
   border-color: var(--card-hover-border);
+  transform: translateY(-2px);
+  /* 悬停微动效果 */
 }
 
 .icon {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
+  width: 20px;
+  /* 稍微调大一点图标 */
+  height: 20px;
+  border-radius: 4px;
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
@@ -66,13 +99,13 @@
 }
 
 .iconLetter {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: white;
 }
@@ -81,13 +114,21 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
+  /* ✅ 新增：防止文字太长换行 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .addButton {
-  display: inline-flex;
+  /* ✅ 修改：样式与 .link 保持一致 */
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 10px 12px;
   background: var(--bg-card);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -123,4 +164,12 @@
   border-radius: var(--radius-md);
   outline: 2px dashed var(--accent-primary);
   outline-offset: -2px;
+}
+
+/* ✅ 新增：响应式适配 */
+/* 当屏幕小于 700px 时（比如手机），变成一行 2 个，否则 4 个会太挤 */
+@media (max-width: 700px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

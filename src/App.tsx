@@ -10,6 +10,7 @@ import {
   SettingsDrawer,
   WallpaperButton,
   GlobalSearch,
+  QuickLinks, // ✅ 1. 引入 QuickLinks 组件
 } from './components';
 import { useSettingsStore, useBookmarkStore } from './stores';
 import { fetchRandomWallpaper } from './utils/wallpaperApi';
@@ -116,6 +117,13 @@ function App() {
             <SearchBar />
           </div>
         </div>
+
+        {/* ✅ 2. 插入快捷访问组件 (受 settings 控制) */}
+        {settings.showQuickLinks && (
+           <div style={{ marginTop: '20px', marginBottom: '-10px', zIndex: 10, position: 'relative' }}>
+             <QuickLinks />
+           </div>
+        )}
 
         {/* 内容区域 */}
         <div className={styles.content}>

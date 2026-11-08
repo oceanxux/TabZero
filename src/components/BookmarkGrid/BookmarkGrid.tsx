@@ -45,6 +45,7 @@ export function BookmarkGrid() {
     activeCategory,
     setActiveCategory,
     incrementVisitCount,
+    addBookmark,
     updateBookmark,
     deleteBookmark,
     reorderBookmarks,
@@ -55,6 +56,7 @@ export function BookmarkGrid() {
   const { t } = useTranslation();
 
   // ❌ 彻底移除了 searchQuery 状态
+  const [isAddingBookmark, setIsAddingBookmark] = useState(false);
   const [editingBookmark, setEditingBookmark] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
 
@@ -74,31 +76,31 @@ export function BookmarkGrid() {
   const [dragOverCategoryId, setDragOverCategoryId] = useState<string | null>(null);
   const dragBookmarkRef = useRef<string | null>(null);
 
-  // 过滤书签 (❌ 移除了搜索词过滤逻辑，只保留分类过滤)
+  // 过滤书签 (分类过滤及未分类归组)
   const filteredBookmarks = useMemo(() => {
-    let result = bookmarks;
-
     if (activeCategory !== 'all') {
-      result = result.filter((b) => b.categoryId === activeCategory);
+      return bookmarks.filter((b) => b.categoryId === activeCategory);
     }
-
-    // 搜索过滤逻辑已删除
-
-    return result;
-  }, [bookmarks, activeCategory]);
+    const customIds = categories
+      .filter((c) => c.id !== 'all' && c.id !== 'dev' && c.id !== 'default')
+      .map((c) => c.id);
+    return customIds.length === 0
+      ? bookmarks
+      : bookmarks.filter((b) => !customIds.includes(b.categoryId));
+  }, [bookmarks, activeCategory, categories]);
 
   const handleBookmarkClick = (id: string) => {
     incrementVisitCount(id);
   };
 
-  // 书签表单字段 (✅ 新增自定义图标 URL 字段)
+  // 书签表单字段
   const bookmarkFields: EditModalField[] = [
     {
       key: 'title',
       label: t.bookmarks.form.title,
       type: 'text',
       placeholder: t.bookmarks.form.title,
-      required: true,
+      required: false,
     },
     {
       key: 'url',
@@ -111,10 +113,13 @@ export function BookmarkGrid() {
       key: 'categoryId',
       label: t.bookmarks.form.category,
       type: 'select',
-      options: categories
-        .filter((c) => c.id !== 'all')
-        .map((c) => ({ value: c.id, label: c.name })),
-      required: true,
+      options: [
+        { value: 'dev', label: '默认 / 未分类' },
+        ...categories
+          .filter((c) => c.id !== 'all' && c.id !== 'dev')
+          .map((c) => ({ value: c.id, label: c.name })),
+      ],
+      required: false,
     },
     {
       key: 'customIconUrl', 
@@ -136,15 +141,29 @@ export function BookmarkGrid() {
     },
   ];
 
-  // ✅ 关键修改：handleEditBookmark - 保存 customIconUrl
+  // 保存书签 (新增或修改)
   const handleEditBookmark = (values: Record<string, string>) => {
-    if (!editingBookmark) return;
-    updateBookmark(editingBookmark, {
-      title: values.title,
-      url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
-      categoryId: values.categoryId,
-      customIconUrl: values.customIconUrl || '', // 👈 保存新字段
-    });
+    if (isAddingBookmark) {
+      addBookmark({
+        id: crypto.randomUUID(),
+        title: values.title || '',
+        url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
+        categoryId: values.categoryId || (activeCategory === 'all' ? 'dev' : activeCategory),
+        customIconUrl: values.customIconUrl || '',
+        color: '#333333',
+        createdAt: Date.now(),
+        visitCount: 0,
+      });
+      setIsAddingBookmark(false);
+    } else if (editingBookmark) {
+      updateBookmark(editingBookmark, {
+        title: values.title,
+        url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
+        categoryId: values.categoryId,
+        customIconUrl: values.customIconUrl || '',
+      });
+      setEditingBookmark(null);
+    }
   };
 
   const handleDeleteBookmark = () => {
@@ -411,7 +430,7 @@ export function BookmarkGrid() {
                 className={`${styles.categoryTab} ${
                   activeCategory === category.id ? styles.active : ''
                 } ${isDragging ? styles.dragging : ''} ${isDragOver ? styles.dragOver : ''}`}
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => setActiveCategory(activeCategory === category.id ? 'all' : category.id)}
                 draggable
                 onDragStart={(e) => handleCatDragStart(e, index)}
                 onDragOver={(e) => handleCatDragOver(e, index)}
@@ -437,64 +456,73 @@ export function BookmarkGrid() {
       {/* 书签网格 */}
       <div className={styles.gridWrapper}>
         <div className={styles.grid}>
-          {filteredBookmarks.length === 0 ? (
-            <div className={styles.empty}>
-              <p>{t.common.noData}</p>
-            </div>
-          ) : (
-            filteredBookmarks.map((bookmark, index) => (
-              <ContextMenu key={bookmark.id} items={getBookmarkContextMenuItems(bookmark.id)}>
-                <a
-                  href={bookmark.url}
-                  className={`${styles.card} ${bookmarkDragIndex === index ? styles.dragging : ''} ${bookmarkOverIndex === index ? styles.dragOver : ''}`}
-                  onClick={() => handleBookmarkClick(bookmark.id)}
-                  title={bookmark.title}
-                  draggable
-                  onDragStart={(e) => handleBookmarkDragStart(e, index, bookmark.id)}
-                  onDragOver={(e) => handleBookmarkDragOver(e, index)}
-                  onDragLeave={handleBookmarkDragLeave}
-                  onDrop={(e) => handleBookmarkDrop(e, index)}
-                  onDragEnd={handleBookmarkDragEnd}
+          {filteredBookmarks.map((bookmark, index) => (
+            <ContextMenu key={bookmark.id} items={getBookmarkContextMenuItems(bookmark.id)}>
+              <a
+                href={bookmark.url}
+                className={`${styles.card} ${bookmarkDragIndex === index ? styles.dragging : ''} ${bookmarkOverIndex === index ? styles.dragOver : ''}`}
+                onClick={() => handleBookmarkClick(bookmark.id)}
+                title={bookmark.title}
+                draggable
+                onDragStart={(e) => handleBookmarkDragStart(e, index, bookmark.id)}
+                onDragOver={(e) => handleBookmarkDragOver(e, index)}
+                onDragLeave={handleBookmarkDragLeave}
+                onDrop={(e) => handleBookmarkDrop(e, index)}
+                onDragEnd={handleBookmarkDragEnd}
+              >
+                <div
+                  className={styles.icon}
+                  style={{ backgroundColor: bookmark.color }}
                 >
-                  <div
-                    className={styles.icon}
-                    style={{ backgroundColor: bookmark.color }}
-                  >
-                    {/* ✅ 关键修复点：整合 Favicon 回退逻辑 */}
-                    <img 
-                      src={bookmark.customIconUrl || bookmark.icon || `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(bookmark.url)}`}
-                      alt="" 
-                      onError={(e) => handleFaviconError(e, bookmark.url)} // 👈 新增
-                    />
-                  </div>
-                  <div className={styles.info}>
-                    <span className={styles.title}>{bookmark.title}</span>
-                    <span className={styles.domain}>{getDomain(bookmark.url)}</span>
-                  </div>
-                </a>
-              </ContextMenu>
-            ))
-          )}
+                  {/* ✅ 关键修复点：整合 Favicon 回退逻辑 */}
+                  <img 
+                    src={bookmark.customIconUrl || bookmark.icon || `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(bookmark.url)}`}
+                    alt="" 
+                    onError={(e) => handleFaviconError(e, bookmark.url)}
+                  />
+                </div>
+                <div className={styles.info}>
+                  <span className={styles.title}>{bookmark.title}</span>
+                  <span className={styles.domain}>{getDomain(bookmark.url)}</span>
+                </div>
+              </a>
+            </ContextMenu>
+          ))}
+          <button
+            type="button"
+            className={styles.addCard}
+            onClick={() => setIsAddingBookmark(true)}
+            title="点击新增书签"
+          >
+            <div className={styles.info}>
+              <span className={styles.title}>点击新增书签</span>
+            </div>
+          </button>
         </div>
       </div>
 
       <EditModal
-        isOpen={!!editingBookmark}
-        onClose={() => setEditingBookmark(null)}
-        title={t.bookmarks.editBookmark}
+        isOpen={isAddingBookmark || !!editingBookmark}
+        onClose={() => {
+          setIsAddingBookmark(false);
+          setEditingBookmark(null);
+        }}
+        title={isAddingBookmark ? t.bookmarks.addBookmark : t.bookmarks.editBookmark}
         fields={bookmarkFields}
         initialValues={
-          currentBookmark
+          editingBookmark && currentBookmark
             ? {
                 title: currentBookmark.title,
                 url: currentBookmark.url,
                 categoryId: currentBookmark.categoryId,
-                customIconUrl: currentBookmark.customIconUrl || '', // 👈 初始化时带上 customIconUrl
+                customIconUrl: currentBookmark.customIconUrl || '',
               }
-            : {}
+            : {
+                categoryId: activeCategory === 'all' ? 'dev' : activeCategory,
+              }
         }
         onSave={handleEditBookmark}
-        onDelete={handleDeleteBookmark}
+        onDelete={isAddingBookmark ? undefined : handleDeleteBookmark}
       />
 
       <EditModal

@@ -29,12 +29,9 @@
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  padding: 6px;
-  background: var(--bg-card);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  padding: 6px 0;
+  background: transparent;
+  border: none;
 }
 
 .categoryTab {
@@ -213,6 +210,38 @@
 .card:hover {
   background: var(--bg-hover);
   border-color: var(--card-hover-border);
+}
+
+.addCard {
+  cursor: pointer;
+  justify-content: center;
+  text-align: center;
+  height: 58px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  transition: var(--transition);
+}
+
+.addCard:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+}
+
+.addCard .info {
+  align-items: center;
+  justify-content: center;
+}
+
+.addCard .title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .icon {

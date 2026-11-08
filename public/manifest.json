@@ -4,10 +4,8 @@
   "version": "1.0.0",
   "description": "极简风的新标签页 - 书签管理、快捷访问、多搜索引擎",
   "permissions": [
-    "storage",
-    "bookmarks",
-    "topSites",
-    "tabs"
+    "favicon",
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"

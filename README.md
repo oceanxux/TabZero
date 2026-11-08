@@ -108,8 +108,8 @@ TabZero/
 #### Option 2: Pre-packaged Extension (.crx / .zip)
 
 Download ready-to-use packages from GitHub Releases:
-- **`TabZero-v1.0.3.zip`** (~160 KB): Standard Chrome Web Store / Edge Add-ons upload package.
-- **`TabZero-v1.0.3.crx`** (~163 KB): One-click drag-and-drop installer for Chromium browsers.
+- **`TabZero-v4.0.zip`** (~160 KB): Standard Chrome Web Store / Edge Add-ons upload package.
+- **`TabZero-v4.0.crx`** (~163 KB): One-click drag-and-drop installer for Chromium browsers.
 
 #### Option 3: Build from Source
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "TabZero",
-  "version": "1.0.0",
-  "description": "极简风的新标签页 - 书签管理、快捷访问、多搜索引擎",
+  "version": "4.0",
+  "description": "TabZero - 极简高颜值新标签页，支持 WebDAV 端到端 AES-256-GCM 强加密同步、浏览器原生书签导入导出、多搜索引擎快捷切换与每日高清壁纸",
   "permissions": [
     "favicon",
     "storage"

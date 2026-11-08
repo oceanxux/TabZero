@@ -11,8 +11,9 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vitejs.dev/)
 [![Security: AES-256-GCM](https://img.shields.io/badge/Encryption-AES--256--GCM-green)](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto)
+[![Manifest V3](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blue)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 
-[English](#english) | [中文](#中文)
+[English](#english) | [中文说明](#中文)
 
 </div>
 
@@ -30,68 +31,142 @@
   <img src="./screenshots/preview-light.png" alt="浅色主题预览" width="100%">
 </p>
 
+---
+
 ### ✨ 核心亮点
 
-- **🎯 极致极简设计** - 现代排版（Outfit + JetBrains Mono 字体），64px 黄金视觉间距，毛玻璃半透明质感，自带文本阅读保护护盾。
-- **🔒 WebDAV 云端同步 (AES-256-GCM 强加密)** - 支持任意标准 WebDAV 服务（Nextcloud、群晖 NAS、Alist 等）。备份数据在本地浏览器端通过原生 Web Crypto API 进行 AES-256-GCM 加密，云端仅存放密文，零隐私泄露风险。
-- **💡 智能同步状态** - 支持「测试连接」一键探活，配备动态呼吸灯（🟢 绿色已连接 / 🔴 红色未连接），连接状态一目了然。
-- **📂 本地数据自由导入/导出**：
-  - **原生 HTML 浏览器书签导入**：一键解析 Chrome/Edge/Safari/Firefox 导出的标准 HTML 书签文件，自动提取文件夹分类与 Favicon 图标。
-  - **JSON 离线备份导出**：书签数据随时随地导出到本地保存，完全离线自主可控。
-- **🔍 多搜索引擎一键轮巡**：
-  - 支持 **Tab / Shift+Tab** 快速轮巡切换搜索引擎。
-  - 支持输入框前缀快捷直达（输入 `b `、`bing ` 切换 Bing；`g ` 切换 Google 等）。
-  - 支持快捷搜索抽屉与自定义搜索引擎扩展。
-- **⌨️ 全局沉浸式快捷键**：
-  - `⌘K` / `Ctrl+K`：随时呼出全局搜索浮层。
-  - `/` 或中文输入法 `、`：一键自动聚焦输入框，敲击即搜。
-  - `Esc`：快速关闭抽屉与弹窗。
-- **🖼️ 微软官方每日 4K 高清壁纸**：
-  - 剔除海外第三方代理中转，直连国内官方高速 CDN，毫秒级快速响应。
-  - 智能利用浏览器原生 HTTP 缓存，离线流畅秒开，杜绝膨胀存储。
-- **⚙️ 贴心细节偏好**：
-  - 书签支持新标签页（`_blank`）或当前标签页（`_self`）打开方式自由切换。
-  - 系统设置独立收纳：时钟、快捷链接、书签栏、主题切换按钮皆可按需自由显隐。
+- **🎯 极致极简视觉设计**
+  - 现代视觉排版，采用 Outfit 与 JetBrains Mono 字体，辅以 64px 舒适间距，视觉焦点更通透自然。
+  - 内置视觉阅读护盾与轻微暗角阴影，确保在任何复杂浅色或深色壁纸下文字均清晰易读。
+- **🔒 WebDAV 云端同步 (AES-256-GCM 端到端强加密)**
+  - 支持任意标准 WebDAV 服务（Nextcloud、群晖 NAS、Alist 等私有云及商业云存储）。
+  - **真正的零知识隐私**：所有书签与分类在本地浏览器内调用原生 Web Crypto API，通过用户设置的密码派生密钥（PBKDF2 10万次哈希），进行 AES-256-GCM 强加密后传输，服务器端仅存储密文。
+- **🟢 智能同步探活与呼吸灯状态**
+  - 设置面板提供一键「🔍 测试连接」，配备动态呼吸指示灯（🟢 绿色已连接 / 🔴 红色未连接），连接健康状态一目了然。
+  - 遇到路径或权限异常时，提供透明友好的中文排查指引（如 401 凭证错误、403 权限受限、404 路径不存在等）。
+- **📂 本地数据双轨导入与导出**
+  - **浏览器原生 HTML 书签无缝解析导入**：完美兼容 Chrome / Edge / Safari / Firefox 导出的标准 Netscape 格式书签 HTML 文件，自动提取文件夹树、分类及 Favicon 图标。
+  - **离线 JSON 备份与导出**：一键导出结构化 JSON 备份文件，纯本地操作，自主可控。
+- **🔍 多搜索引擎一键快捷切换**
+  - 预置并支持 25+ 主流引擎（Google、Bing、Baidu、GitHub、DuckDuckGo、知乎、Bilibili、淘宝、MDN 等）。
+  - **全键盘轮巡**：按 `Tab` / `Shift + Tab` 顺次快速轮巡切换当前搜索引擎。
+  - **前缀快捷直达**：在搜索框输入 `b + 空格` 瞬切 Bing，`g + 空格` 瞬切 Google，直观快捷。
+- **⌨️ 全局沉浸式键盘快捷键**
+  - `⌘K` / `Ctrl + K`：无论焦点何处，随时唤起全局快速搜索遮罩。
+  - 单键 `/` 或中文标点 `、`：一键自动聚焦新标签页主搜索框，提笔即搜。
+  - `Esc`：快速关闭所有侧边抽屉与弹出层。
+- **🖼️ 微软官方国内 CDN 4K 每日壁纸流**
+  - 剔除海外第三方反代中转，直连微软国内官方 CDN（`cn.bing.com`），毫秒级极速下发。
+  - **滚动单张本地缓存机制**：本地永远只保存当前使用的一张壁纸，浏览器磁盘原生强缓存秒开，切换下一张时自动替换，永不膨胀。
+- **⚙️ 贴心细节偏好定制**
+  - 支持书签默认打开方式自由切换（新标签页 `_blank` / 当前标签页 `_self`）。
+  - 系统设置独立收纳：时钟、快捷访问磁贴、书签栏、主题切换按钮皆可按需自由显隐。
 
 ---
 
-### 安装与使用
+### 📂 目录结构树
 
-#### 方式一：加载解压版安装（推荐）
+```text
+TabZero/
+├── TabZero/                  # Chrome 扩展生产分发目录 (可直接加载或打包发布)
+│   ├── manifest.json         # Chrome 扩展核心清单文件 (Manifest V3)
+│   ├── index.html            # 扩展新标签页挂载入口
+│   ├── assets/               # 生产核心运行时 (纯净体积仅 ~590KB)
+│   │   ├── main.js           # 业务逻辑 bundle (React 19 + Zustand + WebDAV + WebCrypto)
+│   │   └── style.css         # 样式与动画定义 (毛玻璃效果、响应式栅格、呼吸灯等)
+│   ├── icons/                # 扩展图标与内置 25+ 搜索引擎高清矢量 SVG
+│   │   ├── icon.svg          # 官方主 Logo 矢量源文件
+│   │   ├── icon16.png / 48 / 128
+│   │   └── engines/          # 各大搜索引擎专用品牌图标 (Google, Bing, GitHub 等)
+│   └── screenshots/          # 4K 高清演示预览截图
+├── public/                   # 公共静态资产目录
+├── src/                      # 现代化开发源码 (TypeScript + React 19)
+│   ├── components/           # UI 模块化组件
+│   │   ├── Bookmarks/        # 书签列表、文件夹树、拖拽排序
+│   │   ├── Clock/            # 极简时钟与日期显示
+│   │   ├── QuickLinks/       # 快捷磁贴面板与编辑对话框
+│   │   ├── SearchBar/        # 搜索输入框、前缀匹配、引擎快捷轮巡
+│   │   ├── SettingsDrawer/   # 侧边设置抽屉 (同步、外观、书签与系统偏好)
+│   │   └── ui/               # 基础设计系统原子组件 (Button, Input, Select, Modal)
+│   ├── hooks/                # 自定义 React Hooks (键盘事件监听、拖拽排序等)
+│   ├── i18n/                 # 国际化语言包 (zh-CN, en-US)
+│   ├── stores/               # Zustand 全局响应式状态总线
+│   ├── types/                # 严谨的 TypeScript 类型契约
+│   └── utils/                # 核心工具库 (AES-256 加密、WebDAV 通信、HTML 书签解析)
+├── package.json              # 项目依赖清单与构建指令
+├── vite.config.ts            # Vite 7 极速现代化构建配置
+└── README.md                 # 项目完整设计文档与使用指南
+```
 
-1. 下载项目 Release 包或克隆本项目：
+---
+
+### 🚀 安装与使用
+
+#### 方式一：直接载入生产目录（最简单，推荐）
+
+1. 下载或克隆本项目：
    ```bash
    git clone git@github.com:oceanxux/TabZero.git
    ```
-2. 打开 Chrome / Edge 浏览器，访问：`chrome://extensions/`
-3. 开启右上角 **「开发者模式」** (Developer mode)；
-4. 点击 **「加载已解压的扩展程序」** (Load unpacked)；
-5. 选择本项目中的 `TabZero` 文件夹，即可立刻开启全新标签页体验！
+2. 打开 Google Chrome 或 Edge 浏览器，访问扩展管理页面：`chrome://extensions/`；
+3. 打开右上角的 **「开发者模式」** (Developer Mode)；
+4. 点击左上角的 **「加载已解压的扩展程序」** (Load Unpacked)；
+5. 在文件选择窗口中选中本项目根目录下的 **`TabZero`** 文件夹即可！
 
-#### 方式二：从源码构建
+#### 方式二：使用官方打包扩展（CRX / ZIP）
+
+项目已在发布目录中为您预打包了两种标准扩展包：
+- **`TabZero-v1.0.3-lean.crx`**（仅 163 KB，支持拖入浏览器直接安装）
+- **`TabZero-v1.0.3-lean.zip`**（仅 160 KB，标准 Chrome Web Store 商店上架包）
+
+#### 方式三：从源码二次构建
 
 ```bash
-# 1. 安装依赖
+# 1. 进入项目根目录并安装依赖
 npm install
 
-# 2. 本地开发调试
+# 2. 启动本地热重载开发服务器
 npm run dev
 
-# 3. 编译打包生产版本
+# 3. 编译打包生成生产版本
 npm run build
 ```
 
 ---
 
-### 快捷键指南
+### ⌨️ 快捷键速查表
 
-| 快捷键 | 功能说明 |
-|--------|----------|
-| `/` 或 `、` | 一键聚焦搜索框（支持中文输入法标点） |
-| `⌘ + K` / `Ctrl + K` | 呼出全局搜索快捷弹窗 |
-| `Tab` / `Shift + Tab` | 顺次轮巡切换搜索引擎 |
-| `b ` / `g ` / `bd ` + 空格 | 输入前缀快捷切换至对应引擎 |
-| `Esc` | 关闭当前弹窗或侧边设置抽屉 |
+| 按键 | 功能说明 | 适用场景 |
+| :--- | :--- | :--- |
+| **`/`** 或 **`、`** | **聚焦搜索框**（完美兼容中文输入法） | 随时准备输入搜索关键词 |
+| **`⌘ + K`** 或 **`Ctrl + K`** | **呼出全局快捷搜索浮层** | 在新标签页任何位置瞬时唤出搜索 |
+| **`Tab`** / **`Shift + Tab`** | **向后 / 向前轮巡搜索引擎** | 无需移动鼠标，键盘快速切引擎 |
+| **`b `** / **`g `** + 空格 | **输入引擎前缀直达** | 如输入 `b 摄影` 自动使用 Bing 检索 |
+| **`Esc`** | **退出 / 关闭浮层** | 快速关闭设置抽屉或搜索浮层 |
+
+---
+
+### 🛡️ 数据安全与加密原理解析
+
+TabZero 秉持真正的「端到端隐私安全」，没有任何中心化收集服务器：
+
+```
+[ 用户书签数据 ]
+       │
+       ▼
+[ Web Crypto API (本地浏览器沙盒) ]
+  ├── 密码派生密钥：PBKDF2 (100,000 次 SHA-256 迭代计算)
+  ├── 随机生成 Salt (16字节) + IV (12字节)
+  └── 对称高强度加密：AES-256-GCM 认证加密
+       │
+       ▼
+[ 加密密文数据 (包含 ciphertext, salt, iv) ]
+       │
+       ▼  (HTTPS 加密通道传输)
+[ 您的私有 WebDAV 服务器 (Nextcloud / 群晖 / NAS) ]
+```
+
+> **注意**：即使服务器被第三方攻破或截获备份文件，在没有您本地应用密码的情况下，任何人都无法解密密文。
 
 ---
 
@@ -99,29 +174,29 @@ npm run build
 
 ### ✨ Key Features
 
-- **🎯 Ultra Minimalist Aesthetics** - Modern typography with Outfit & JetBrains Mono fonts, 64px optimized hero spacing, frosted glass effects, and smart readability shields.
-- **🔒 WebDAV End-to-End Encrypted Sync** - Sync bookmarks with any WebDAV provider (Nextcloud, Synology NAS, Alist, etc.). Data is encrypted locally before transmission using native Web Crypto API (AES-256-GCM + PBKDF2), ensuring true zero-knowledge privacy.
-- **💡 Real-time Connection Status** - Built-in connection testing with breathing status indicators (🟢 Connected / 🔴 Disconnected).
+- **🎯 Ultra Minimalist Aesthetics** - Contemporary layout featuring Outfit and JetBrains Mono typography with 64px golden hero spacing and automatic readability shields.
+- **🔒 WebDAV End-to-End Encrypted Sync** - Synchronize your bookmarks with any standard WebDAV service (Nextcloud, Synology NAS, Alist, etc.). Your credentials and data are encrypted locally before transmission via browser-native Web Crypto API (AES-256-GCM + PBKDF2 100k rounds). Zero privacy leaks.
+- **🟢 Active Connection Monitor** - Built-in connection testing paired with pulsing breathing status dots (🟢 Connected / 🔴 Disconnected).
 - **📂 Native Browser Bookmark Import & Export**:
-  - Direct parsing of standard HTML bookmark exports from Chrome, Edge, Safari, and Firefox with automatic folder categorization and icons.
-  - JSON backup and restore with complete offline privacy.
-- **🔍 Instant Search Engine Switching**:
-  - Cycle through 20+ search engines with `Tab` / `Shift+Tab`.
-  - Prefix shortcuts like `b + Space` for Bing, `g + Space` for Google.
+  - Direct, lossless parsing of standard HTML bookmark files exported from Chrome, Edge, Safari, and Firefox.
+  - Offline JSON backup and restoration.
+- **🔍 Multi Search Engine Instant Switching**:
+  - Full keyboard cycling with `Tab` / `Shift + Tab`.
+  - Prefix shortcuts (e.g., `b + Space` for Bing, `g + Space` for Google).
 - **⌨️ Keyboard Centric Workflow**:
-  - `⌘K` / `Ctrl+K`: Global search overlay.
-  - `/` or Chinese punctuation `、`: Instant search focus.
-- **🖼️ Official Bing 4K Daily Wallpapers** - Direct CDN streaming with native browser caching, ensuring instant 1ms loads without local storage bloating.
-- **⚙️ Custom Preferences** - Flexible bookmark open targets (`_blank` vs `_self`), toggleable UI modules (Clock, Bookmarks, Quick Links).
+  - `⌘K` / `Ctrl+K`: Instant global search modal.
+  - `/` or `、`: Quick search focus.
+- **🖼️ Official Bing 4K Daily Streaming Wallpaper** - Direct CDN integration with Microsoft China CDN (`cn.bing.com`) without overseas proxies. Cached on local disk natively by the browser HTTP cache for 1ms startup.
+- **⚙️ Detailed Preferences** - Configurable bookmark open behavior (`_blank` vs `_self`), toggleable widgets (Clock, Quick Links, Bookmarks, Theme toggle).
 
 ---
 
 ### License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is open-sourced under the [MIT License](LICENSE).
 
 <div align="center">
 
-**Built with ❤️ for a cleaner, faster web browsing experience.**
+**Crafted with care for a cleaner, faster web browsing experience.**
 
 </div>

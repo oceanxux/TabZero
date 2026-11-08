@@ -172,6 +172,18 @@ TabZero 秉持真正的「端到端隐私安全」，没有任何中心化收集
 
 ## English
 
+### Preview
+
+<p align="center">
+  <img src="./screenshots/preview-dark.png" alt="Dark Theme Preview" width="100%">
+</p>
+
+<p align="center">
+  <img src="./screenshots/preview-light.png" alt="Light Theme Preview" width="100%">
+</p>
+
+---
+
 ### ✨ Key Features
 
 - **🎯 Ultra Minimalist Aesthetics** - Contemporary layout featuring Outfit and JetBrains Mono typography with 64px golden hero spacing and automatic readability shields.

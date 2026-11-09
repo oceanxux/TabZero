@@ -1,10 +1,175 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8b5cf6"/>
-      <stop offset="100%" style="stop-color:#6366f1"/>
+    <!-- Background Canvas: Gentle Luminous Morning Ivory Silk -->
+    <linearGradient id="canvasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="45%" stop-color="#fffcf8"/>
+      <stop offset="100%" stop-color="#fef4e8"/>
     </linearGradient>
+
+    <!-- Canvas Subtle Golden Rim -->
+    <linearGradient id="canvasBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#fed7aa" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- Browser Window Card Gradient -->
+    <linearGradient id="windowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98"/>
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0.92"/>
+    </linearGradient>
+
+    <!-- Active Tab Hero Gradient: TabZero Sunrise (Warm Gold -> Amber Orange -> Coral Rose) -->
+    <linearGradient id="tabGrad" x1="5%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="45%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+
+    <!-- Active Tab Specular Highlight Sheen -->
+    <linearGradient id="tabSheen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Inactive Tab Background -->
+    <linearGradient id="inactiveTabGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#e2e8f0" stop-opacity="0.75"/>
+    </linearGradient>
+
+    <!-- Search Capsule Gradient -->
+    <linearGradient id="searchGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fff7ed"/>
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="squircleShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#f59e0b" flood-opacity="0.14"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.04"/>
+    </filter>
+
+    <filter id="windowShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#64748b" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.04"/>
+    </filter>
+
+    <filter id="tabShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#ea580c" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#f43f5e" flood-opacity="0.22"/>
+    </filter>
+
+    <filter id="zeroGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#881337" flood-opacity="0.32"/>
+    </filter>
   </defs>
-  <rect width="128" height="128" rx="24" fill="url(#bg)"/>
-  <text x="64" y="82" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="white" text-anchor="middle">N</text>
+
+  <!-- 1. Background Squircle Canvas -->
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#canvasGrad)" filter="url(#squircleShadow)"/>
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="none" stroke="url(#canvasBorder)" stroke-width="2.5"/>
+
+  <!-- 2. Browser Window Body -->
+  <g filter="url(#windowShadow)">
+    <rect x="48" y="76" width="416" height="360" rx="28" fill="url(#windowGrad)" stroke="#e2e8f0" stroke-width="1.5"/>
+
+    <!-- Mac Window Traffic Lights -->
+    <circle cx="84" cy="110" r="8" fill="#fca5a5"/>
+    <circle cx="110" cy="110" r="8" fill="#fde047"/>
+    <circle cx="136" cy="110" r="8" fill="#86efac"/>
+
+    <!-- Window Top Header Background Strip -->
+    <path d="M 48 76 L 464 76 Q 464 76 464 136 L 48 136 Z" fill="#f1f5f9" fill-opacity="0.3" clip-path="url(#windowClip)"/>
+
+    <!-- Tab Bar Platform Line -->
+    <line x1="48" y1="244" x2="464" y2="244" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Left Inactive Tab -->
+    <path d="
+      M 68 244
+      L 74 186
+      C 76 172, 86 162, 100 162
+      L 160 162
+      C 174 162, 184 172, 186 186
+      L 192 244
+      Z
+    " fill="url(#inactiveTabGrad)" stroke="#cbd5e1" stroke-width="1.5"/>
+    <!-- Inactive Tab Content -->
+    <circle cx="106" cy="204" r="8" fill="#94a3b8" opacity="0.45"/>
+    <rect x="122" y="200" width="42" height="7" rx="3.5" fill="#94a3b8" opacity="0.4"/>
+
+    <!-- Right "New Tab" (+) Button -->
+    <g transform="translate(426, 204)">
+      <circle cx="0" cy="0" r="16" fill="#ffffff" stroke="#fed7aa" stroke-width="2"/>
+      <line x1="0" y1="-7" x2="0" y2="7" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-7" y1="0" x2="7" y2="0" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- 3. Active Tab (The Hero TabZero Tab) -->
+    <!-- Proportions: Width = 236, Height = 114 (Top y=130, Base y=244) -->
+    <g filter="url(#tabShadow)">
+      <!-- Tab Base & Outward Shoulder Curves -->
+      <path d="
+        M 176 244
+        C 194 244, 204 230, 208 212
+        L 216 156
+        C 220 140, 232 130, 248 130
+        L 356 130
+        C 372 130, 384 140, 388 156
+        L 396 212
+        C 400 230, 410 244, 428 244
+        Z
+      " fill="url(#tabGrad)"/>
+
+      <!-- Specular Highlight Sheen -->
+      <path d="
+        M 176 244
+        C 194 244, 204 230, 208 212
+        L 216 156
+        C 220 140, 232 130, 248 130
+        L 356 130
+        C 372 130, 384 140, 388 156
+        L 396 212
+        C 400 230, 410 244, 428 244
+        Z
+      " fill="url(#tabSheen)"/>
+
+      <!-- Left Favicon Slot: Bright Morning Spark -->
+      <path d="M 242 188 Q 242 195 249 195 Q 242 195 242 202 Q 242 195 235 195 Q 242 195 242 188 Z" fill="#ffffff" opacity="0.95"/>
+
+      <!-- Right Tab Close 'x' -->
+      <circle cx="372" cy="168" r="9" fill="#ffffff" fill-opacity="0.25"/>
+      <line x1="368.5" y1="164.5" x2="375.5" y2="171.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <line x1="375.5" y1="164.5" x2="368.5" y2="171.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Tab Center Brand Identity: Pure White "0" (TabZero Zero) -->
+      <g transform="translate(302, 187)" filter="url(#zeroGlow)">
+        <!-- Elegant Geometric Zero -->
+        <rect x="-22" y="-34" width="44" height="68" rx="22" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+        <!-- Zen Core Dot -->
+        <circle cx="0" cy="0" r="5" fill="#ffffff"/>
+      </g>
+    </g>
+
+    <!-- 4. Browser Page Viewport: Minimalist New Tab Page -->
+    <rect x="70" y="266" width="372" height="148" rx="18" fill="#ffffff" stroke="#f1f5f9" stroke-width="1.5"/>
+
+    <!-- Clock / Greeting Pill -->
+    <rect x="220" y="292" width="72" height="14" rx="7" fill="#f59e0b" fill-opacity="0.15"/>
+    <rect x="238" y="296" width="36" height="6" rx="3" fill="#f59e0b" fill-opacity="0.85"/>
+
+    <!-- Central Minimalist Search Capsule (TabZero's Signature) -->
+    <rect x="100" y="326" width="312" height="42" rx="21" fill="url(#searchGrad)" stroke="#fed7aa" stroke-width="1.8"/>
+    <!-- Search Icon Dot -->
+    <circle cx="126" cy="347" r="7" fill="#f97316"/>
+    <!-- Search Placeholder Text Pill -->
+    <rect x="144" y="343" width="112" height="8" rx="4" fill="#cbd5e1" opacity="0.7"/>
+    <!-- Engine Switcher Dot -->
+    <circle cx="388" cy="347" r="6" fill="#f43f5e" opacity="0.6"/>
+
+    <!-- Subtle Zen Horizon Line -->
+    <line x1="160" y1="392" x2="352" y2="392" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+  </g>
 </svg>

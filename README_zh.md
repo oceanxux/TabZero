@@ -114,8 +114,8 @@ TabZero/
 #### 方式二：使用官方打包扩展（CRX / ZIP）
 
 项目已在发布目录中为您预打包了两种标准扩展包：
-- **`TabZero-v4.1.crx`**（仅 163 KB，支持拖入浏览器直接安装）
-- **`TabZero-v4.1.zip`**（仅 160 KB，标准 Chrome Web Store / Edge 商店上架包）
+- **`TabZero-v4.2.crx`**（仅 163 KB，支持拖入浏览器直接安装）
+- **`TabZero-v4.2.zip`**（仅 160 KB，标准 Chrome Web Store / Edge 商店上架包）
 
 #### 方式三：从源码二次构建
 

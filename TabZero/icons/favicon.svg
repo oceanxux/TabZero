@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <!-- Outer Ring -->
+  <circle cx="64" cy="64" r="54" stroke="#1f2937" stroke-width="9"/>
+  <!-- Inner Center Ring -->
+  <circle cx="64" cy="64" r="22" stroke="#1f2937" stroke-width="9"/>
+  <!-- Three Divider Arms (Chrome Geometry) -->
+  <path d="M 64 42 L 111 42" stroke="#1f2937" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 83 75 L 60 115" stroke="#1f2937" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 45 75 L 21 35" stroke="#1f2937" stroke-width="9" stroke-linecap="round"/>
+</svg>

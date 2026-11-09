@@ -2,126 +2,172 @@
 
 # TabZero
 
-**✨ 极简高效、颜值至上的现代化浏览器新标签页扩展**
+**✨ Ultra-minimalist, aesthetic, privacy-first modern browser new tab extension**
 
-一个基于 React 19 + TypeScript 构建的极致极简、注重隐私与交互体验的浏览器新标签页。
+[English](README.md) | [简体中文](README_zh.md)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vitejs.dev/)
-[![Security: AES-256-GCM](https://img.shields.io/badge/Encryption-AES--256--GCM-green)](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto)
-
-[English](#english) | [中文](#中文)
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" alt="React 19"></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript" alt="TypeScript 5.9"></a>
+  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite" alt="Vite 7"></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto"><img src="https://img.shields.io/badge/Encryption-AES--256--GCM-green" alt="AES-256-GCM"></a>
+  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blue" alt="Manifest V3"></a>
+</p>
 
 </div>
 
 ---
 
-## 中文
-
-### 预览
+### Preview
 
 <p align="center">
-  <img src="./screenshots/preview-dark.png" alt="深色主题预览" width="100%">
+  <img src="./screenshots/preview-dark.png" alt="Dark Mode Preview" width="100%">
 </p>
 
 <p align="center">
-  <img src="./screenshots/preview-light.png" alt="浅色主题预览" width="100%">
+  <img src="./screenshots/preview-light.png" alt="Light Mode Preview" width="100%">
 </p>
-
-### ✨ 核心亮点
-
-- **🎯 极致极简设计** - 现代排版（Outfit + JetBrains Mono 字体），64px 黄金视觉间距，毛玻璃半透明质感，自带文本阅读保护护盾。
-- **🔒 WebDAV 云端同步 (AES-256-GCM 强加密)** - 支持任意标准 WebDAV 服务（Nextcloud、群晖 NAS、Alist 等）。备份数据在本地浏览器端通过原生 Web Crypto API 进行 AES-256-GCM 加密，云端仅存放密文，零隐私泄露风险。
-- **💡 智能同步状态** - 支持「测试连接」一键探活，配备动态呼吸灯（🟢 绿色已连接 / 🔴 红色未连接），连接状态一目了然。
-- **📂 本地数据自由导入/导出**：
-  - **原生 HTML 浏览器书签导入**：一键解析 Chrome/Edge/Safari/Firefox 导出的标准 HTML 书签文件，自动提取文件夹分类与 Favicon 图标。
-  - **JSON 离线备份导出**：书签数据随时随地导出到本地保存，完全离线自主可控。
-- **🔍 多搜索引擎一键轮巡**：
-  - 支持 **Tab / Shift+Tab** 快速轮巡切换搜索引擎。
-  - 支持输入框前缀快捷直达（输入 `b `、`bing ` 切换 Bing；`g ` 切换 Google 等）。
-  - 支持快捷搜索抽屉与自定义搜索引擎扩展。
-- **⌨️ 全局沉浸式快捷键**：
-  - `⌘K` / `Ctrl+K`：随时呼出全局搜索浮层。
-  - `/` 或中文输入法 `、`：一键自动聚焦输入框，敲击即搜。
-  - `Esc`：快速关闭抽屉与弹窗。
-- **🖼️ 微软官方每日 4K 高清壁纸**：
-  - 剔除海外第三方代理中转，直连国内官方高速 CDN，毫秒级快速响应。
-  - 智能利用浏览器原生 HTTP 缓存，离线流畅秒开，杜绝膨胀存储。
-- **⚙️ 贴心细节偏好**：
-  - 书签支持新标签页（`_blank`）或当前标签页（`_self`）打开方式自由切换。
-  - 系统设置独立收纳：时钟、快捷链接、书签栏、主题切换按钮皆可按需自由显隐。
 
 ---
 
-### 安装与使用
+### ✨ Key Features
 
-#### 方式一：加载解压版安装（推荐）
+- **🎯 Ultra Minimalist Aesthetics**
+  - Modern typography powered by *Outfit* and *JetBrains Mono*, with comfortable 64px golden hero spacing.
+  - Built-in dynamic readability shields and subtle vignette shading, ensuring crystalline text legibility across both vibrant light and deep dark wallpapers.
+- **🔒 WebDAV Cloud Sync (Zero-Knowledge AES-256-GCM Encryption)**
+  - Seamlessly syncs with any standard WebDAV cloud (Nextcloud, Synology NAS, Alist, etc.).
+  - **Zero-knowledge privacy**: All bookmarks and categories are encrypted client-side using the browser-native Web Crypto API with PBKDF2 (100,000 iterations) derived keys and AES-256-GCM authenticated encryption. Your server only stores encrypted ciphertext.
+- **🟢 Active Connection Monitoring & Breathing Status Indicator**
+  - One-click "Test Connection" with an animated pulsing breathing light (🟢 Connected / 🔴 Disconnected).
+  - Clear, user-friendly diagnostic guidance for common HTTP errors (401 Bad Credentials, 403 Forbidden, 404 Not Found).
+- **📂 Native Browser Bookmark Import & Export**
+  - **Lossless HTML Parsing**: Seamlessly import standard Netscape bookmark HTML files exported from Chrome, Edge, Safari, and Firefox, preserving folder hierarchies and favicon associations.
+  - **Offline JSON Backup**: One-click structured JSON export and import for full offline data sovereignty.
+- **🔍 Multi-Search Engine Instant Switching**
+  - Pre-configured with 25+ mainstream search engines (Google, Bing, Baidu, GitHub, DuckDuckGo, Zhihu, Bilibili, Taobao, MDN, etc.).
+  - **Full Keyboard Cycling**: Press `Tab` or `Shift + Tab` to seamlessly cycle through search engines without touching the mouse.
+  - **Direct Prefix Triggers**: Type `b + Space` for Bing, `g + Space` for Google, `gh + Space` for GitHub directly in the search bar.
+- **⌨️ Keyboard-First Workflow**
+  - `⌘K` / `Ctrl + K`: Summon global quick search overlay anywhere.
+  - `/` or `、`: Instantly focus the main search bar (fully IME-friendly).
+  - `Esc`: Dismiss any drawer, modal, or overlay instantly.
+- **🖼️ Microsoft Official Bing 4K Daily Streaming Wallpapers**
+  - Direct connection to Microsoft's official China CDN (`cn.bing.com`) without slow overseas third-party proxies.
+  - **Rolling Single-Cache Architecture**: Maintains only the active wallpaper in local disk cache, launching in 1ms while eliminating storage bloat.
+- **⚙️ Deep Customization & Widget Toggles**
+  - Configurable link open behavior (`_blank` new tab vs `_self` current tab).
+  - Independent visibility toggles for Clock, Quick Link Tiles, Bookmark Bar, and Theme Switcher.
 
-1. 下载项目 Release 包或克隆本项目：
+---
+
+### 📂 Directory Structure
+
+```text
+TabZero/
+├── TabZero/                  # Production-ready Chrome Extension distribution
+│   ├── manifest.json         # Extension Manifest V3 configuration
+│   ├── index.html            # New tab page entrypoint
+│   ├── assets/               # Production runtime (~590 KB total)
+│   │   ├── main.js           # Bundle (React 19 + Zustand + WebDAV + WebCrypto)
+│   │   └── style.css         # Styles (glassmorphism, animations, responsive grid)
+│   ├── icons/                # High-res SVG and PNG extension icons
+│   │   ├── icon.svg          # Master vector logo
+│   │   ├── icon16.png / 48 / 128
+│   │   └── engines/          # Vector icons for 25+ search engines
+│   └── screenshots/          # High-resolution demonstration previews
+├── public/                   # Static assets
+├── src/                      # Source code (TypeScript + React 19)
+│   ├── components/           # UI components (Bookmarks, Clock, SearchBar, Settings)
+│   ├── hooks/                # Custom React hooks
+│   ├── i18n/                 # Localization (en-US, zh-CN)
+│   ├── stores/               # Zustand state stores
+│   ├── types/                # TypeScript type definitions
+│   └── utils/                # Crypto, WebDAV client, bookmark parser
+├── package.json              # Project dependencies & build scripts
+├── vite.config.ts            # Vite 7 build configuration
+└── README.md                 # Project documentation
+```
+
+---
+
+### 🚀 Installation & Getting Started
+
+#### Option 1: Load Unpacked Extension (Fastest & Recommended)
+
+1. Clone or download this repository:
    ```bash
    git clone git@github.com:oceanxux/TabZero.git
    ```
-2. 打开 Chrome / Edge 浏览器，访问：`chrome://extensions/`
-3. 开启右上角 **「开发者模式」** (Developer mode)；
-4. 点击 **「加载已解压的扩展程序」** (Load unpacked)；
-5. 选择本项目中的 `TabZero` 文件夹，即可立刻开启全新标签页体验！
+2. Open Google Chrome or Microsoft Edge and navigate to `chrome://extensions/` (or `edge://extensions/`).
+3. Enable **Developer mode** in the top-right corner.
+4. Click **Load unpacked** in the top-left corner.
+5. Select the **`TabZero`** folder in the root directory.
 
-#### 方式二：从源码构建
+#### Option 2: Pre-packaged Extension (.crx / .zip)
+
+Download ready-to-use packages from GitHub Releases:
+- **`TabZero-v1.0.3.zip`** (~160 KB): Standard Chrome Web Store / Edge Add-ons upload package.
+- **`TabZero-v1.0.3.crx`** (~163 KB): One-click drag-and-drop installer for Chromium browsers.
+
+#### Option 3: Build from Source
 
 ```bash
-# 1. 安装依赖
+# 1. Install dependencies
 npm install
 
-# 2. 本地开发调试
+# 2. Start local hot-reload development server
 npm run dev
 
-# 3. 编译打包生产版本
+# 3. Build production bundle
 npm run build
 ```
 
 ---
 
-### 快捷键指南
+### ⌨️ Keyboard Shortcuts Reference
 
-| 快捷键 | 功能说明 |
-|--------|----------|
-| `/` 或 `、` | 一键聚焦搜索框（支持中文输入法标点） |
-| `⌘ + K` / `Ctrl + K` | 呼出全局搜索快捷弹窗 |
-| `Tab` / `Shift + Tab` | 顺次轮巡切换搜索引擎 |
-| `b ` / `g ` / `bd ` + 空格 | 输入前缀快捷切换至对应引擎 |
-| `Esc` | 关闭当前弹窗或侧边设置抽屉 |
-
----
-
-## English
-
-### ✨ Key Features
-
-- **🎯 Ultra Minimalist Aesthetics** - Modern typography with Outfit & JetBrains Mono fonts, 64px optimized hero spacing, frosted glass effects, and smart readability shields.
-- **🔒 WebDAV End-to-End Encrypted Sync** - Sync bookmarks with any WebDAV provider (Nextcloud, Synology NAS, Alist, etc.). Data is encrypted locally before transmission using native Web Crypto API (AES-256-GCM + PBKDF2), ensuring true zero-knowledge privacy.
-- **💡 Real-time Connection Status** - Built-in connection testing with breathing status indicators (🟢 Connected / 🔴 Disconnected).
-- **📂 Native Browser Bookmark Import & Export**:
-  - Direct parsing of standard HTML bookmark exports from Chrome, Edge, Safari, and Firefox with automatic folder categorization and icons.
-  - JSON backup and restore with complete offline privacy.
-- **🔍 Instant Search Engine Switching**:
-  - Cycle through 20+ search engines with `Tab` / `Shift+Tab`.
-  - Prefix shortcuts like `b + Space` for Bing, `g + Space` for Google.
-- **⌨️ Keyboard Centric Workflow**:
-  - `⌘K` / `Ctrl+K`: Global search overlay.
-  - `/` or Chinese punctuation `、`: Instant search focus.
-- **🖼️ Official Bing 4K Daily Wallpapers** - Direct CDN streaming with native browser caching, ensuring instant 1ms loads without local storage bloating.
-- **⚙️ Custom Preferences** - Flexible bookmark open targets (`_blank` vs `_self`), toggleable UI modules (Clock, Bookmarks, Quick Links).
+| Shortcut | Description | Context |
+| :--- | :--- | :--- |
+| **`/`** or **`、`** | **Focus Search Bar** | Works seamlessly with Asian/Chinese IME |
+| **`⌘ + K`** / **`Ctrl + K`** | **Summon Quick Search Overlay** | Available anywhere on the new tab page |
+| **`Tab`** / **`Shift + Tab`** | **Cycle Search Engines** | Quick search engine switching without mouse |
+| **`b `** / **`g `** + Space | **Prefix Search Switching** | e.g., type `b keywords` for Bing search |
+| **`Esc`** | **Close Overlays / Modals** | Closes settings drawer or search modal |
 
 ---
 
-### License
+### 🛡️ Security & Privacy Architecture
+
+TabZero adheres strictly to zero-knowledge privacy principles:
+
+```
+[ Local User Bookmarks & Data ]
+             │
+             ▼
+[ Web Crypto API (Browser Sandbox) ]
+   ├── Key Derivation: PBKDF2 (100,000 iterations of SHA-256)
+   ├── Cryptographic Nonce: 16-byte Salt + 12-byte IV
+   └── Authenticated Encryption: AES-256-GCM
+             │
+             ▼
+[ Encrypted Ciphertext Payload (ciphertext, salt, iv) ]
+             │
+             ▼ (Transported via HTTPS)
+[ Your Private WebDAV Server (Nextcloud / Synology / Alist) ]
+```
+
+> **Note**: Even if your WebDAV storage or network is compromised, no third party can decrypt your bookmarks without your local master password.
+
+---
+
+### 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
 
 <div align="center">
 
-**Built with ❤️ for a cleaner, faster web browsing experience.**
+**Crafted with care for a cleaner, faster web browsing experience.**
 
 </div>

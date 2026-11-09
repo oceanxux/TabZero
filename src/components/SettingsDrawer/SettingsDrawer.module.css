@@ -397,3 +397,239 @@
 .resetButton {
   display: none;
 }
+
+/* 分类与书签管理增强样式 (上下结构 + 单行原位呼吸灯) */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.categoryItem:hover {
+  background: var(--bg-active);
+  border-color: var(--card-hover-border);
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.catName {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+}
+
+.catName:hover {
+  color: var(--accent-primary);
+}
+
+.catName:hover::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--accent-primary) 50%, transparent);
+  border-radius: 2px;
+}
+
+@keyframes breathePulse {
+  0%, 100% {
+    box-shadow: 0 0 6px var(--accent-primary), 0 0 14px color-mix(in srgb, var(--accent-primary) 40%, transparent);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 12px var(--accent-primary), 0 0 22px var(--accent-primary);
+    opacity: 1;
+  }
+}
+
+.inlineEditGroup {
+  display: inline-flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  white-space: nowrap;
+}
+
+.inlineInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 2px 4px;
+  width: 100%;
+  max-width: 220px;
+}
+
+.breathingLine {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+  animation: breathePulse 2.2s infinite ease-in-out;
+}
+
+.bmActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.filterSelectWrapper {
+  flex: 1;
+  max-width: 200px;
+}
+
+.filterSelect {
+  width: 100%;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 6px 10px;
+  font-size: 12.5px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filterSelect:focus {
+  border-color: var(--accent-primary);
+}
+
+.bmList {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.bmItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.bmItem:hover {
+  background: var(--bg-active);
+  border-color: var(--card-hover-border);
+}
+
+.bmLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.bmFavicon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.bmInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+  flex: 1;
+}
+
+.bmTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bmUrl {
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bmRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bmTag {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.bmActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.emptyBookmarks {
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 16px 0;
+  text-align: center;
+}

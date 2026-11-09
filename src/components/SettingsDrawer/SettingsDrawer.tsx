@@ -1,6 +1,6 @@
-import { useState, useEffect, type ReactNode, useRef } from 'react'; // ✅ 确保引入了 useRef
+import { useState, useEffect, useMemo, type ReactNode, useRef } from 'react'; // ✅ 确保引入了 useRef
 import { useSettingsStore, useBookmarkStore, useTrashStore } from '../../stores';
-import { ACCENT_COLORS, COLORS } from '../../types';
+import { ACCENT_COLORS, COLORS, type Bookmark } from '../../types';
 import { ColorPicker } from '../ColorPicker';
 import { Switch, Slider, Button, Input, Select } from '../ui';
 import { TrashPanel } from '../TrashPanel';
@@ -17,8 +17,8 @@ interface SettingsDrawerProps {
   onClose: () => void;
 }
 
-// ✅ 包含 'sync' 的菜单定义
-type MenuKey = 'theme' | 'bookmarks' | 'categories' | 'trash' | 'sync' | 'system';
+// ✅ 合并分类与书签为统一的 'bookmarks' (书签管理)
+type MenuKey = 'theme' | 'bookmarks' | 'trash' | 'sync' | 'system';
 
 // --- 图标组件 ---
 const ThemeIcon = () => (
@@ -72,11 +72,30 @@ const CloudIcon = () => (
 
 export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
   const { settings, updateSettings } = useSettingsStore();
-  const { categories, addCategory, deleteCategory, bookmarks, activeCategory, setActiveCategory, addBookmark } = useBookmarkStore();
+  const {
+    categories,
+    addCategory,
+    deleteCategory,
+    updateCategory,
+    bookmarks,
+    activeCategory,
+    setActiveCategory,
+    addBookmark,
+    updateBookmark,
+    deleteBookmark,
+  } = useBookmarkStore();
   const { addToTrash } = useTrashStore();
   const { t, locale, setLocale, supportedLocales } = useTranslation();
   const [activeMenu, setActiveMenu] = useState<MenuKey>('theme');
   const [newCategoryName, setNewCategoryName] = useState('');
+
+  // 分类原位修改状态 (呼吸灯流光激活)
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState('');
+
+  // 书签筛选与编辑状态
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   
   // 添加书签弹窗状态
   const [isAddBookmarkModalOpen, setIsAddBookmarkModalOpen] = useState(false);
@@ -165,8 +184,7 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
   // 菜单项配置
   const menuItems: { key: MenuKey; label: string; icon: ReactNode }[] = [
     { key: 'theme', label: t.settings.theme.title, icon: <ThemeIcon /> },
-    { key: 'bookmarks', label: t.bookmarks.addBookmark, icon: <BookmarkIcon /> },
-    { key: 'categories', label: t.bookmarks.form.category, icon: <CategoryIcon /> },
+    { key: 'bookmarks', label: '书签管理', icon: <BookmarkIcon /> },
     { key: 'sync', label: '云同步', icon: <CloudIcon /> },
     { key: 'trash', label: t.settings.trash.title, icon: <TrashIcon /> },
     { key: 'system', label: t.settings.system.title, icon: <SystemIcon /> },
@@ -255,6 +273,21 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
     setNewCategoryName('');
   };
 
+  const handleStartEditCategory = (cat: { id: string; name: string }) => {
+    setEditingCategoryId(cat.id);
+    setEditingCategoryName(cat.name);
+  };
+
+  const handleSaveCategoryName = () => {
+    if (editingCategoryId) {
+      const trimmed = editingCategoryName.trim();
+      if (trimmed) {
+        updateCategory(editingCategoryId, { name: trimmed });
+      }
+      setEditingCategoryId(null);
+    }
+  };
+
   const handleDeleteCategory = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
     const categoryBookmarks = bookmarks.filter(b => b.categoryId === categoryId);
@@ -273,6 +306,21 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
       setActiveCategory('all');
     }
   };
+
+  const handleDeleteBookmark = (bm: Bookmark) => {
+    addToTrash({
+      id: `trash-${Date.now()}`,
+      type: 'bookmark',
+      data: bm,
+      deletedAt: Date.now(),
+    });
+    deleteBookmark(bm.id);
+  };
+
+  const displayedBookmarks = useMemo(() => {
+    if (selectedCategoryFilter === 'all') return bookmarks;
+    return bookmarks.filter(b => b.categoryId === selectedCategoryFilter);
+  }, [bookmarks, selectedCategoryFilter]);
 
   return (
     <>
@@ -316,26 +364,6 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
           <div className={styles.contentBody}>
             {activeMenu === 'theme' && (
               <>
-                <div className={styles.section}>
-                  <div className={styles.settingRow}>
-                    <span className={styles.settingLabel}>{t.settings.theme.darkMode}</span>
-                    <Switch
-                      checked={settings.themeMode === 'dark'}
-                      onChange={(checked) => updateSettings({ themeMode: checked ? 'dark' : 'light' })}
-                    />
-                  </div>
-                </div>
-                
-                <div className={styles.section}>
-                  <div className={styles.settingRow}>
-                    <span className={styles.settingLabel}>{t.settings.theme.showThemeToggle}</span>
-                    <Switch
-                      checked={settings.showThemeToggle}
-                      onChange={(checked) => updateSettings({ showThemeToggle: checked })}
-                    />
-                  </div>
-                </div>
-
                 <div className={styles.section}>
                   <div className={styles.settingRow}>
                     <span className={styles.settingLabel}>{t.settings.theme.borderRadius}</span>
@@ -474,116 +502,190 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
                     onChange={(v) => updateSettings({ backgroundBlurLight: v })}
                   />
                 </div>
-
-                <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>{t.settings.clock.title}</h3>
-                  <div className={styles.optionList}>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.clock.showSeconds}</span>
-                      <Switch
-                        checked={settings.showSeconds}
-                        onChange={(checked) => updateSettings({ showSeconds: checked })}
-                      />
-                    </div>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.clock.clockColor}</span>
-                      <ColorPicker
-                        value={settings.clockColor}
-                        onChange={(color) => updateSettings({ clockColor: color })}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.section}>
-                  <h3 className={styles.sectionTitle}>{t.settings.display.title}</h3>
-                  <div className={styles.optionList}>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.display.showClock}</span>
-                      <Switch
-                        checked={settings.showClock}
-                        onChange={(checked) => updateSettings({ showClock: checked })}
-                      />
-                    </div>
-                    {/* 已删除: 每日一言 & 最近访问 */}
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.display.showQuickLinks}</span>
-                      <Switch
-                        checked={settings.showQuickLinks}
-                        onChange={(checked) => updateSettings({ showQuickLinks: checked })}
-                      />
-                    </div>
-                    <div className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{t.settings.display.showBookmarks}</span>
-                      <Switch
-                        checked={settings.showBookmarks}
-                        onChange={(checked) => updateSettings({ showBookmarks: checked })}
-                      />
-                    </div>
-                  </div>
-                </div>
               </>
             )}
 
             {activeMenu === 'bookmarks' && (
-              <div className={styles.section}>
-                 <h3 className={styles.sectionTitle} style={{ marginBottom: '16px' }}>{t.bookmarks.addBookmark}</h3>
-                 <div style={{ padding: '0 4px' }}>
-                   <Button onClick={() => setIsAddBookmarkModalOpen(true)} style={{ width: '100%' }}>
-                     + {t.bookmarks.addBookmark}
-                   </Button>
-                   <p style={{ marginTop: '12px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                     {t.common.noData ? "提示：您也可以在主页右键点击书签进行编辑或删除。" : "Tip: You can also right-click bookmarks on the home page to edit or delete them."}
-                   </p>
-                 </div>
-              </div>
-            )}
-
-            {activeMenu === 'categories' && (
-              <div className={styles.section}>
-                <div className={styles.wallpaperGroup}>
-                  <label className={styles.wallpaperLabel}>{t.bookmarks.addCategory}</label>
-                  <div className={styles.wallpaperInputRow}>
-                    <Input
-                      type="text"
-                      placeholder={t.bookmarks.form.title}
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      fullWidth
-                    />
-                    <Button onClick={handleAddCategory}>
-                      {t.common.add}
-                    </Button>
+              <>
+                {/* 1. 上半部分：分类管理 */}
+                <div className={styles.section}>
+                  <div className={styles.wallpaperGroup}>
+                    <label className={styles.wallpaperLabel} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <CategoryIcon />
+                      <span>{t.bookmarks.addCategory || '分类管理'}</span>
+                    </label>
+                    <div className={styles.wallpaperInputRow}>
+                      <Input
+                        type="text"
+                        placeholder="输入新分类名称..."
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleAddCategory();
+                        }}
+                        fullWidth
+                      />
+                      <Button onClick={handleAddCategory}>
+                        {t.common.add || '添加'}
+                      </Button>
+                    </div>
                   </div>
-                </div>
 
-                <h3 className={styles.sectionTitle} style={{ marginTop: '24px' }}>{t.bookmarks.form.category}</h3>
-                <div className={styles.optionList}>
-                  {categories.map((category) => (
-                    <div key={category.id} className={styles.settingRow}>
-                      <span className={styles.settingLabel}>{category.name}</span>
-                      {category.id !== 'all' && (
+                  <h3 className={styles.sectionTitle} style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>已有分类</span>
+                    <span style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 400, textTransform: 'none', letterSpacing: 'normal' }}>
+                      * 点击名称直接原位修改
+                    </span>
+                  </h3>
+                  <div className={styles.categoryList}>
+                    {categories.filter(c => c.id !== 'all').map((category) => (
+                      <div key={category.id} className={styles.categoryItem}>
+                        <div className={styles.categoryLeft}>
+                          {editingCategoryId === category.id ? (
+                            <div className={styles.inlineEditGroup}>
+                              <input
+                                type="text"
+                                className={styles.inlineInput}
+                                value={editingCategoryName}
+                                onChange={(e) => setEditingCategoryName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveCategoryName();
+                                  if (e.key === 'Escape') setEditingCategoryId(null);
+                                }}
+                                onBlur={handleSaveCategoryName}
+                                autoFocus
+                              />
+                              <div className={styles.breathingLine} />
+                            </div>
+                          ) : (
+                            <span
+                              className={styles.catName}
+                              onClick={() => handleStartEditCategory(category)}
+                              title="点击直接修改名称"
+                            >
+                              {category.name}
+                            </span>
+                          )}
+                        </div>
                         <Button
                           variant="ghost"
                           size="small"
                           onClick={() => handleDeleteCategory(category.id)}
-                          style={{ color: '#ff4d4f' }}
+                          style={{ color: '#ff4d4f', padding: '4px' }}
+                          title="删除分类"
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                           </svg>
                         </Button>
-                      )}
-                    </div>
-                  ))}
-                  {categories.length <= 1 && (
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '13px', padding: '8px 0' }}>
-                      {t.common.noData}
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                    {categories.filter(c => c.id !== 'all').length === 0 && (
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '13px', padding: '8px 0' }}>
+                        {t.common.noData || '暂无分类'}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+
+                {/* 2. 下半部分：书签管理 */}
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle} style={{ marginBottom: '14px' }}>书签管理</h3>
+                  
+                  {/* 操作栏：全部分类在左，添加书签在右 */}
+                  <div className={styles.bmActionBar}>
+                    <div className={styles.filterSelectWrapper}>
+                      <select
+                        className={styles.filterSelect}
+                        value={selectedCategoryFilter}
+                        onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                      >
+                        <option value="all">全部分类 ({bookmarks.length})</option>
+                        {categories.filter(c => c.id !== 'all').map(c => {
+                          const count = bookmarks.filter(b => b.categoryId === c.id).length;
+                          return (
+                            <option key={c.id} value={c.id}>
+                              {c.name} ({count})
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </div>
+                    <Button onClick={() => setIsAddBookmarkModalOpen(true)}>
+                      + {t.bookmarks.addBookmark || '添加书签'}
+                    </Button>
+                  </div>
+
+                  {/* 已有书签列表 */}
+                  <div className={styles.bmList}>
+                    {displayedBookmarks.length === 0 ? (
+                      <div className={styles.emptyBookmarks}>
+                        {t.common.noData || '暂无书签数据'}
+                      </div>
+                    ) : (
+                      displayedBookmarks.map((bm) => {
+                        const cat = categories.find(c => c.id === bm.categoryId);
+                        const catName = cat ? cat.name : '默认';
+                        return (
+                          <div
+                            key={bm.id}
+                            className={styles.bmItem}
+                            onClick={() => setEditingBookmark(bm)}
+                            style={{ cursor: 'pointer' }}
+                            title="点击直接修改书签"
+                          >
+                            <div className={styles.bmLeft}>
+                              <div
+                                className={styles.bmFavicon}
+                                style={{ backgroundColor: bm.color || 'rgba(255,255,255,0.08)' }}
+                              >
+                                <img
+                                  src={bm.customIconUrl || bm.icon || `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(bm.url)}`}
+                                  alt=""
+                                  onError={(e) => {
+                                    const img = e.currentTarget;
+                                    img.onerror = null;
+                                    try {
+                                      img.src = `https://icons.duckduckgo.com/ip3/${new URL(bm.url).hostname}.ico`;
+                                    } catch {
+                                      img.style.display = 'none';
+                                    }
+                                  }}
+                                  style={{ width: '15px', height: '15px', objectFit: 'contain' }}
+                                />
+                              </div>
+                              <div className={styles.bmInfo}>
+                                <span className={styles.bmTitle} title={bm.title}>{bm.title}</span>
+                                <span className={styles.bmUrl} title={bm.url}>{bm.url}</span>
+                              </div>
+                            </div>
+
+                            <div className={styles.bmRight}>
+                              <span className={styles.bmTag}>{catName}</span>
+                              <Button
+                                variant="ghost"
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteBookmark(bm);
+                                }}
+                                style={{ color: '#ff4d4f', padding: '4px' }}
+                                title="删除书签"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              </>
             )}
 
             {/* ✅ 关键修复：WebDAV 同步面板 (解决了所有 TS6133 错误) */}
@@ -696,7 +798,79 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
 
             {activeMenu === 'system' && (
               <>
+                {/* 1. 深色模式 (在显示上面) */}
                 <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{t.settings.theme.darkMode || '深色模式'}</h3>
+                  <div className={styles.optionList}>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.theme.darkMode}</span>
+                      <Switch
+                        checked={settings.themeMode === 'dark'}
+                        onChange={(checked) => updateSettings({ themeMode: checked ? 'dark' : 'light' })}
+                      />
+                    </div>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.theme.showThemeToggle}</span>
+                      <Switch
+                        checked={settings.showThemeToggle}
+                        onChange={(checked) => updateSettings({ showThemeToggle: checked })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. 显示设置 */}
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{t.settings.display.title || '显示'}</h3>
+                  <div className={styles.optionList}>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.display.showClock}</span>
+                      <Switch
+                        checked={settings.showClock}
+                        onChange={(checked) => updateSettings({ showClock: checked })}
+                      />
+                    </div>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.display.showQuickLinks}</span>
+                      <Switch
+                        checked={settings.showQuickLinks}
+                        onChange={(checked) => updateSettings({ showQuickLinks: checked })}
+                      />
+                    </div>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.display.showBookmarks}</span>
+                      <Switch
+                        checked={settings.showBookmarks}
+                        onChange={(checked) => updateSettings({ showBookmarks: checked })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. 时间模块 (在显示分类下面) */}
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{t.settings.clock.title || '时间模块'}</h3>
+                  <div className={styles.optionList}>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.clock.showSeconds}</span>
+                      <Switch
+                        checked={settings.showSeconds}
+                        onChange={(checked) => updateSettings({ showSeconds: checked })}
+                      />
+                    </div>
+                    <div className={styles.settingRow}>
+                      <span className={styles.settingLabel}>{t.settings.clock.clockColor}</span>
+                      <ColorPicker
+                        value={settings.clockColor}
+                        onChange={(color) => updateSettings({ clockColor: color })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. 语言设置 */}
+                <div className={styles.section}>
+                  <h3 className={styles.sectionTitle}>{t.settings.system.language || '语言'}</h3>
                   <div className={styles.settingRow}>
                     <span className={styles.settingLabel}>{t.settings.system.language}</span>
                     <div className={styles.selectWrapper}>
@@ -722,6 +896,28 @@ export function SettingsDrawer({ isOpen, onClose }: SettingsDrawerProps) {
         initialValues={{ categoryId: activeCategory === 'all' ? (categories.find(c => c.id !== 'all')?.id || 'dev') : activeCategory }}
         onSave={handleAddBookmark}
       />
+
+      {editingBookmark && (
+        <EditModal
+          isOpen={true}
+          onClose={() => setEditingBookmark(null)}
+          title={t.bookmarks.editBookmark || '编辑书签'}
+          fields={bookmarkFields}
+          initialValues={{
+            title: editingBookmark.title,
+            url: editingBookmark.url,
+            categoryId: editingBookmark.categoryId,
+          }}
+          onSave={(values) => {
+            updateBookmark(editingBookmark.id, {
+              title: values.title,
+              url: values.url.startsWith('http') ? values.url : `https://${values.url}`,
+              categoryId: values.categoryId,
+            });
+            setEditingBookmark(null);
+          }}
+        />
+      )}
     </>
   );
 }

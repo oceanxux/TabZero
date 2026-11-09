@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "TabZero - 极简高颜值新标签页",
+    "description": "扩展名称"
+  },
+  "appDesc": {
+    "message": "极简高颜值新标签页，支持 WebDAV 端到端 AES-256-GCM 强加密同步、浏览器原生书签导入导出、多搜索引擎快捷切换与 120+ 每日高清壁纸",
+    "description": "扩展描述"
+  }
+}

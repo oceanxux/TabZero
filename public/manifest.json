@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "TabZero",
+  "name": "__MSG_appName__",
   "version": "4.3",
-  "description": "TabZero - 极简高颜值新标签页，支持 WebDAV 端到端 AES-256-GCM 强加密同步、浏览器原生书签导入导出、多搜索引擎快捷切换与每日高清壁纸",
+  "description": "__MSG_appDesc__",
   "permissions": [
     "favicon",
     "storage"
@@ -17,5 +17,6 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "default_locale": "zh_CN"
 }

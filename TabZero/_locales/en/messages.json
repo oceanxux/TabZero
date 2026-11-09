@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "TabZero - Minimalist New Tab",
+    "description": "Extension name"
+  },
+  "appDesc": {
+    "message": "A minimalist, aesthetic new tab with WebDAV AES-256-GCM encrypted sync, bookmark import/export, multi-search switching, and 120+ daily HD wallpapers.",
+    "description": "Extension description"
+  }
+}

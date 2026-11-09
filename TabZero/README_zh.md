@@ -13,7 +13,7 @@
   <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite" alt="Vite 7"></a>
   <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto"><img src="https://img.shields.io/badge/Encryption-AES--256--GCM-green" alt="AES-256-GCM"></a>
   <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-blue" alt="Manifest V3"></a>
-  <img src="https://img.shields.io/badge/Version-v4.3-brightgreen" alt="Version: v4.3">
+  <img src="https://img.shields.io/badge/Version-v4.3.1-brightgreen" alt="Version: v4.3.1">
 </p>
 
 </div>
